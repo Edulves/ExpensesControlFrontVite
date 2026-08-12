@@ -7,6 +7,7 @@ import AddExpenseModal from "../components/expenses/AddExpenseModal";
 import { fetchDailyExpenses, fetchExpensesPerCategory, type ExpenseByCategory } from "../services/api";
 import { getCookie } from "../utils/cookies";
 import type { Expense } from "../types";
+import { categories } from "../data";
 
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
@@ -22,16 +23,47 @@ export default function DailyExpensesPage() {
     const [totalToday, setTotalToday] = useState(0);
     const [month, setMonth] = useState(now.getMonth() + 1);
     const [year, setYear] = useState(now.getFullYear());
+    const [beginningOfPeriod, setBeginningOfPeriod] = useState("");
+    const [endOfPeriod, setEndOfPeriod] = useState("");
+    const [category, setCategory] = useState("");
+    const [note, setNote] = useState("");
+
+    // Filtros "aplicados" — só são atualizados ao clicar em Apply
+    const [appliedMonth, setAppliedMonth] = useState(now.getMonth() + 1);
+    const [appliedYear, setAppliedYear] = useState(now.getFullYear());
+    const [appliedBeginningOfPeriod, setAppliedBeginningOfPeriod] = useState("");
+    const [appliedEndOfPeriod, setAppliedEndOfPeriod] = useState("");
+    const [appliedCategory, setAppliedCategory] = useState("");
+    const [appliedNote, setAppliedNote] = useState("");
+
+    const [page, setPage] = useState(1);
+    const [qty, setQty] = useState(10);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalItems, setTotalItems] = useState(0);
 
     const loadData = async () => {
         try {
             setLoading(true);
             setError(null);
-            const [data, categoryData] = await Promise.all([
-                fetchDailyExpenses({ month, year }),
-                fetchExpensesPerCategory(month, year),
+            const dateFilters = {
+                month: appliedMonth,
+                year: appliedYear,
+                beginningOfPeriod: appliedBeginningOfPeriod,
+                endOfPeriod: appliedEndOfPeriod,
+            };
+            const [expenseResponse, categoryData] = await Promise.all([
+                fetchDailyExpenses({
+                    ...dateFilters,
+                    category: appliedCategory,
+                    note: appliedNote,
+                    page,
+                    qty,
+                }),
+                fetchExpensesPerCategory(dateFilters),
             ]);
-            setExpenses(data);
+            setExpenses(expenseResponse.items);
+            setTotalPages(expenseResponse.totalPages);
+            setTotalItems(expenseResponse.totalItems);
             setTopCategories(categoryData.categories);
             setTotalToday(categoryData.total);
         } catch (err) {
@@ -56,12 +88,26 @@ export default function DailyExpensesPage() {
             try {
                 setLoading(true);
                 setError(null);
-                const [data, categoryData] = await Promise.all([
-                    fetchDailyExpenses({ month, year }),
-                    fetchExpensesPerCategory(month, year),
+                const dateFilters = {
+                    month: appliedMonth,
+                    year: appliedYear,
+                    beginningOfPeriod: appliedBeginningOfPeriod,
+                    endOfPeriod: appliedEndOfPeriod,
+                };
+                const [expenseResponse, categoryData] = await Promise.all([
+                    fetchDailyExpenses({
+                        ...dateFilters,
+                        category: appliedCategory,
+                        note: appliedNote,
+                        page,
+                        qty,
+                    }),
+                    fetchExpensesPerCategory(dateFilters),
                 ]);
                 if (!cancelled) {
-                    setExpenses(data);
+                    setExpenses(expenseResponse.items);
+                    setTotalPages(expenseResponse.totalPages);
+                    setTotalItems(expenseResponse.totalItems);
                     setTopCategories(categoryData.categories);
                     setTotalToday(categoryData.total);
                 }
@@ -81,10 +127,16 @@ export default function DailyExpensesPage() {
         return () => {
             cancelled = true;
         };
-    }, [month, year]);
+    }, [appliedMonth, appliedYear, appliedBeginningOfPeriod, appliedEndOfPeriod, appliedCategory, appliedNote, page, qty]);
 
     const handleApplyFilters = () => {
-        loadData();
+        setAppliedMonth(month);
+        setAppliedYear(year);
+        setAppliedBeginningOfPeriod(beginningOfPeriod);
+        setAppliedEndOfPeriod(endOfPeriod);
+        setAppliedCategory(category);
+        setAppliedNote(note);
+        setPage(1);
     };
 
     return (
@@ -130,6 +182,69 @@ export default function DailyExpensesPage() {
                         </select>
                     </div>
 
+                    {/* Beginning of Period */}
+                    <div className="space-y-1">
+                        <label className="font-label-caps text-xs font-semibold text-on-surface block" htmlFor="begin-filter">
+                            From
+                        </label>
+                        <input
+                            id="begin-filter"
+                            type="date"
+                            value={beginningOfPeriod}
+                            onChange={(e) => setBeginningOfPeriod(e.target.value)}
+                            className="bg-surface-container-lowest border border-border-subtle rounded-lg px-3 py-2 font-body-lg text-base text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+                        />
+                    </div>
+
+                    {/* End of Period */}
+                    <div className="space-y-1">
+                        <label className="font-label-caps text-xs font-semibold text-on-surface block" htmlFor="end-filter">
+                            To
+                        </label>
+                        <input
+                            id="end-filter"
+                            type="date"
+                            value={endOfPeriod}
+                            onChange={(e) => setEndOfPeriod(e.target.value)}
+                            className="bg-surface-container-lowest border border-border-subtle rounded-lg px-3 py-2 font-body-lg text-base text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+                        />
+                    </div>
+
+                    {/* Category Select */}
+                    <div className="space-y-1">
+                        <label className="font-label-caps text-xs font-semibold text-on-surface block" htmlFor="category-filter">
+                            Category
+                        </label>
+                        <select
+                            id="category-filter"
+                            className="bg-surface-container-lowest border border-border-subtle rounded-lg px-3 py-2 font-body-lg text-base text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+                            value={category}
+                            onChange={(e) => setCategory(e.target.value)}
+                        >
+                            <option value="">All categories</option>
+                            {categories.map((c) => (
+                                <option key={c.id} value={c.id}>
+                                    {c.name.charAt(0).toUpperCase() + c.name.slice(1)}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {/* Note Input */}
+                    <div className="space-y-1">
+                        <label className="font-label-caps text-xs font-semibold text-on-surface block" htmlFor="note-filter">
+                            Note
+                        </label>
+                        <input
+                            id="note-filter"
+                            type="text"
+                            placeholder="Search note..."
+                            value={note}
+                            onChange={(e) => setNote(e.target.value)}
+                            className="bg-surface-container-lowest border border-border-subtle rounded-lg px-3 py-2 font-body-lg text-base text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+                        />
+                    </div>
+
                     {/* Apply Button */}
                     <button
                         onClick={handleApplyFilters}
@@ -139,11 +254,7 @@ export default function DailyExpensesPage() {
                     </button>
                 </div>
 
-                <div className="flex gap-3">
-                    <button className="hidden md:flex bg-surface-container-lowest border border-border-subtle text-primary rounded-lg py-1 px-4 items-center justify-center gap-2 hover:bg-surface-container-low transition-colors font-label-caps text-xs font-semibold">
-                        <span className="material-symbols-outlined text-[18px]">filter_list</span>
-                        Filter
-                    </button>
+                <div className="flex">
                     <button
                         onClick={() => setModalOpen(true)}
                         className="hidden md:flex bg-primary text-on-primary rounded-lg py-1 px-4 items-center justify-center gap-2 hover:bg-primary-container transition-colors shadow-sm font-label-caps text-xs font-semibold"
@@ -151,7 +262,7 @@ export default function DailyExpensesPage() {
                         <span className="material-symbols-outlined" data-weight="fill">
                             add
                         </span>
-                        New Entry
+                        Nova despesa
                     </button>
                 </div>
             </div>
@@ -178,6 +289,52 @@ export default function DailyExpensesPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <ExpensesTable expenses={expenses} />
                     <QuickStatsPanel totalToday={totalToday} topCategories={topCategories} />
+                </div>
+            )}
+
+            {!loading && !error && (
+                <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
+                    <div className="flex items-center gap-2">
+                        <label className="font-label-caps text-xs font-semibold text-on-surface-variant" htmlFor="qty-filter">
+                            Rows per page
+                        </label>
+                        <select
+                            id="qty-filter"
+                            className="bg-surface-container-lowest border border-border-subtle rounded-lg px-2 py-1.5 font-body-sm text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+                            value={qty}
+                            onChange={(e) => {
+                                setQty(Number(e.target.value));
+                                setPage(1);
+                            }}
+                        >
+                            {[5, 10, 25, 50, 100].map((n) => (
+                                <option key={n} value={n}>
+                                    {n}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <button
+                            type="button"
+                            disabled={page <= 1}
+                            onClick={() => setPage((p) => Math.max(1, p - 1))}
+                            className="px-3 py-1.5 rounded-lg border border-border-subtle font-label-caps text-xs font-semibold text-primary hover:bg-surface-container-low transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                        >
+                            Prev
+                        </button>
+                        <span className="font-label-caps text-xs font-semibold text-on-surface-variant">
+                            Page {page} of {Math.max(1, totalPages)} · {totalItems} item(s)
+                        </span>
+                        <button
+                            type="button"
+                            disabled={page >= totalPages}
+                            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                            className="px-3 py-1.5 rounded-lg border border-border-subtle font-label-caps text-xs font-semibold text-primary hover:bg-surface-container-low transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                        >
+                            Next
+                        </button>
+                    </div>
                 </div>
             )}
 

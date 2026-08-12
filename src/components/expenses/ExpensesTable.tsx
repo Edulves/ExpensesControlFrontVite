@@ -1,85 +1,59 @@
-import type { Expense } from '../../types'
+import type { Expense } from "../../types";
 
 interface ExpensesTableProps {
-  expenses: Expense[]
+    expenses: Expense[];
 }
 
 const categoryPillClasses: Record<string, string> = {
-  lanche: 'bg-warning-amber/10 text-warning-amber',
-  mercado: 'bg-secondary-fixed-dim/20 text-on-secondary-fixed-variant',
-  uber: 'bg-surface-tint/10 text-surface-tint',
-}
+    lanche: "bg-warning-amber/10 text-warning-amber",
+    mercado: "bg-secondary-fixed-dim/20 text-on-secondary-fixed-variant",
+    uber: "bg-surface-tint/10 text-surface-tint",
+};
 
 export default function ExpensesTable({ expenses }: ExpensesTableProps) {
-  return (
-    <div className="lg:col-span-2 bg-surface-container-lowest border border-border-subtle rounded-xl p-0 overflow-hidden flex flex-col">
-      <div className="p-6 border-b border-border-subtle bg-surface-bright flex justify-between items-center gap-4">
-        <h3 className="font-title-md text-xl font-semibold text-on-surface">Recent Transactions</h3>
-        <div className="relative hidden sm:block">
-          <span className="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-outline text-[20px]">
-            search
-          </span>
-          <input
-            className="pl-8 pr-4 py-1 text-sm border border-border-subtle rounded bg-surface-container-lowest text-on-surface focus:outline-none focus:border-primary font-body-sm w-48"
-            placeholder="Search..."
-            type="text"
-          />
+    return (
+        <div className="lg:col-span-2 bg-surface-container-lowest border border-border-subtle rounded-xl p-0 overflow-hidden flex flex-col">
+            <div className="overflow-x-auto flex-grow">
+                <table className="w-full text-left border-collapse">
+                    <thead>
+                        <tr className="border-b border-border-subtle bg-surface-container-low">
+                            <th className="py-3 px-6 font-label-caps text-xs text-on-surface-variant font-semibold">Date</th>
+                            <th className="py-3 px-6 font-label-caps text-xs text-on-surface-variant font-semibold">Description</th>
+                            <th className="py-3 px-6 font-label-caps text-xs text-on-surface-variant font-semibold">Category</th>
+                            <th className="py-3 px-6 font-label-caps text-xs text-on-surface-variant font-semibold text-right">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody className="font-body-sm text-sm">
+                        {expenses.map((expense) => (
+                            <tr
+                                key={expense.id}
+                                className="border-b border-border-subtle last:border-b-0 hover:bg-surface-bright transition-colors relative group"
+                            >
+                                <td className="py-3 px-6 text-on-surface-variant whitespace-nowrap">
+                                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-negative-rose opacity-0 group-hover:opacity-100 transition-opacity" />
+                                    {expense.date}
+                                </td>
+                                <td className="py-3 px-6 font-medium text-on-surface">{expense.description}</td>
+                                <td className="py-3 px-6">
+                                    <span
+                                        className={`inline-flex items-center gap-1 px-2 py-1 rounded font-label-caps text-[10px] ${
+                                            categoryPillClasses[expense.categoryId] ?? "bg-surface-container-high text-on-surface-variant"
+                                        }`}
+                                    >
+                                        {expense.categoryLabel}
+                                    </span>
+                                </td>
+                                <td className="py-3 px-6 text-right font-label-numeric text-sm font-medium text-on-surface">
+                                    -${expense.amount.toFixed(2)}
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+            <div className="p-3 border-t border-border-subtle bg-surface-bright flex justify-center">
+                <button className="text-primary font-label-caps text-xs font-semibold hover:underline">View All Logs</button>
+            </div>
         </div>
-      </div>
-      <div className="overflow-x-auto flex-grow">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="border-b border-border-subtle bg-surface-container-low">
-              <th className="py-3 px-6 font-label-caps text-xs font-semibold text-on-surface-variant font-semibold">
-                Date
-              </th>
-              <th className="py-3 px-6 font-label-caps text-xs font-semibold text-on-surface-variant font-semibold">
-                Description
-              </th>
-              <th className="py-3 px-6 font-label-caps text-xs font-semibold text-on-surface-variant font-semibold">
-                Category
-              </th>
-              <th className="py-3 px-6 font-label-caps text-xs font-semibold text-on-surface-variant font-semibold text-right">
-                Amount
-              </th>
-            </tr>
-          </thead>
-          <tbody className="font-body-sm text-sm">
-            {expenses.map((expense) => (
-              <tr
-                key={expense.id}
-                className="border-b border-border-subtle last:border-b-0 hover:bg-surface-bright transition-colors relative group"
-              >
-                <td className="py-3 px-6 text-on-surface-variant whitespace-nowrap">
-                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-negative-rose opacity-0 group-hover:opacity-100 transition-opacity" />
-                  {expense.date}
-                </td>
-                <td className="py-3 px-6 font-medium text-on-surface">
-                  {expense.description}
-                </td>
-                <td className="py-3 px-6">
-                  <span
-                    className={`inline-flex items-center gap-1 px-2 py-1 rounded font-label-caps text-[10px] ${
-                      categoryPillClasses[expense.categoryId] ??
-                      'bg-surface-container-high text-on-surface-variant'
-                    }`}
-                  >
-                    {expense.categoryLabel}
-                  </span>
-                </td>
-                <td className="py-3 px-6 text-right font-label-numeric text-sm font-medium text-on-surface">
-                  -${expense.amount.toFixed(2)}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <div className="p-3 border-t border-border-subtle bg-surface-bright flex justify-center">
-        <button className="text-primary font-label-caps text-xs font-semibold hover:underline">
-          View All Logs
-        </button>
-      </div>
-    </div>
-  )
+    );
 }

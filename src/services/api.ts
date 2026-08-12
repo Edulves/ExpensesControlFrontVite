@@ -23,23 +23,41 @@ export interface DailyExpenseFilters {
     qty?: number;
 }
 
-export async function fetchDailyExpenses(filters: DailyExpenseFilters): Promise<Expense[]> {
+export interface PagedExpenses {
+    items: Expense[];
+    currentPage: number;
+    itemsPerPage: number;
+    totalItems: number;
+    totalPages: number;
+}
+
+export async function fetchDailyExpenses(filters: DailyExpenseFilters): Promise<PagedExpenses> {
     const token = getCookie("authToken");
 
     if (!token) {
         throw new Error("Token de autenticação não encontrado. Faça login novamente.");
     }
 
-    const params = new URLSearchParams({
-        Month: String(filters.month),
-        Year: String(filters.year),
-        BeginningOfPeriod: filters.beginningOfPeriod ?? "",
-        EndOfPeriod: filters.endOfPeriod ?? "",
-        Category: filters.category ?? "",
-        Note: filters.note ?? "",
-        Page: String(filters.page ?? 1),
-        QTY: String(filters.qty ?? 100),
-    });
+    // Quando um período completo (início e fim) é informado, o filtro isolado de
+    // Mês/Ano é desconsiderado (o backend aplicaria ambos combinados com AND).
+    const hasPeriod = Boolean(filters.beginningOfPeriod) && Boolean(filters.endOfPeriod);
+
+    const params = new URLSearchParams();
+
+    if (hasPeriod) {
+        params.set("BeginningOfPeriod", filters.beginningOfPeriod!);
+        params.set("EndOfPeriod", filters.endOfPeriod!);
+    } else {
+        params.set("Month", String(filters.month || 0));
+        params.set("Year", String(filters.year || 0));
+        params.set("BeginningOfPeriod", filters.beginningOfPeriod ?? "");
+        params.set("EndOfPeriod", filters.endOfPeriod ?? "");
+    }
+
+    params.set("Category", filters.category ?? "");
+    params.set("Note", filters.note ?? "");
+    params.set("Page", String(filters.page ?? 1));
+    params.set("QTY", String(filters.qty ?? 10));
 
     const url = `${API_BASE_URL}/DailyExpenses?${params.toString()}`;
 
@@ -55,10 +73,11 @@ export async function fetchDailyExpenses(filters: DailyExpenseFilters): Promise<
 
     const data = await response.json();
 
-    // O retorno pode ser um array direto ou um objeto com uma propriedade de lista
-    const items: DailyExpenseResponse[] = Array.isArray(data) ? data : data.items || data.data || data.expenses || [];
+    // PagedResult<T>: { items, currentPage, itemsPerPage, totalItems, totalPages }.
+    // Também tolera retorno como array direto (sem metadados de paginação).
+    const rawItems: DailyExpenseResponse[] = Array.isArray(data) ? data : data.items || data.data || data.expenses || [];
 
-    return items.map((item) => ({
+    const items: Expense[] = rawItems.map((item) => ({
         id: String(item.dailyExpenseId),
         description: item.note,
         categoryId: item.categoryName,
@@ -68,6 +87,14 @@ export async function fetchDailyExpenses(filters: DailyExpenseFilters): Promise<
         icon: "receipt_long",
         accentColor: "neutral",
     }));
+
+    return {
+        items,
+        currentPage: data.currentPage ?? filters.page ?? 1,
+        itemsPerPage: data.itemsPerPage ?? filters.qty ?? 10,
+        totalItems: data.totalItems ?? items.length,
+        totalPages: data.totalPages ?? 1,
+    };
 }
 
 export interface ExpenseByCategory {
@@ -92,22 +119,32 @@ const CATEGORY_COLORS = [
     "bg-outline",
 ];
 
-export async function fetchExpensesPerCategory(
-    month: number,
-    year: number
-): Promise<{ categories: ExpenseByCategory[]; total: number }> {
+export async function fetchExpensesPerCategory(filters: {
+    month: number;
+    year: number;
+    beginningOfPeriod?: string;
+    endOfPeriod?: string;
+}): Promise<{ categories: ExpenseByCategory[]; total: number }> {
     const token = getCookie("authToken");
 
     if (!token) {
         throw new Error("Token de autenticação não encontrado. Faça login novamente.");
     }
 
-    const params = new URLSearchParams({
-        Month: String(month),
-        Year: String(year),
-        BeginningOfPeriod: "",
-        EndOfPeriod: "",
-    });
+    // Mesma regra do fetchDailyExpenses: período completo desconsidera Mês/Ano.
+    const hasPeriod = Boolean(filters.beginningOfPeriod) && Boolean(filters.endOfPeriod);
+
+    const params = new URLSearchParams();
+
+    if (hasPeriod) {
+        params.set("BeginningOfPeriod", filters.beginningOfPeriod!);
+        params.set("EndOfPeriod", filters.endOfPeriod!);
+    } else {
+        params.set("Month", String(filters.month || 0));
+        params.set("Year", String(filters.year || 0));
+        params.set("BeginningOfPeriod", "");
+        params.set("EndOfPeriod", "");
+    }
 
     const url = `${API_BASE_URL}/DataConsolidation/ExpensesPerCategory?${params.toString()}`;
 
