@@ -1,32 +1,105 @@
-import { useState, type FormEvent } from 'react'
-import { categories } from '../../data'
+import { useEffect, useState, type FormEvent } from 'react'
+import {
+  fetchTransactionCategories,
+  createDailyExpenses,
+  type TransactionCategory,
+} from '../../services/api'
 
 interface AddExpenseModalProps {
   open: boolean
   onClose: () => void
-  onSave?: (data: { amount: string; date: string; category: string; note: string }) => void
+  onSaved?: () => void
+}
+
+interface EntryRow {
+  amount: string
+  date: string
+  categoryId: number
+  note: string
 }
 
 const today = new Date().toISOString().slice(0, 10)
 
-export default function AddExpenseModal({ open, onClose, onSave }: AddExpenseModalProps) {
-  const [amount, setAmount] = useState('')
-  const [date, setDate] = useState(today)
-  const [category, setCategory] = useState(categories[0]?.id ?? '')
-  const [note, setNote] = useState('')
+const emptyRow = (categoryId: number): EntryRow => ({
+  amount: '',
+  date: today,
+  categoryId,
+  note: '',
+})
+
+export default function AddExpenseModal({ open, onClose, onSaved }: AddExpenseModalProps) {
+  const [rows, setRows] = useState<EntryRow[]>([])
+  const [categs, setCategs] = useState<TransactionCategory[]>([])
+  const [saving, setSaving] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
+
+  // Ao abrir: reinicia com um lançamento vazio e carrega as categorias reais (Ids inteiros)
+  useEffect(() => {
+    if (!open) return
+    setRows([emptyRow(0)])
+    setSubmitError(null)
+    let cancelled = false
+    fetchTransactionCategories()
+      .then((list) => {
+        if (!cancelled) setCategs(list)
+      })
+      .catch((err) => {
+        if (!cancelled) setSubmitError(err instanceof Error ? err.message : 'Erro ao carregar categorias.')
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [open])
+
+  // Preenche as linhas que ainda não tinham categoria assim que a lista carrega
+  useEffect(() => {
+    if (!categs.length) return
+    const firstId = categs[0].transactionCategoryId
+    setRows((prev) => prev.map((r) => (r.categoryId ? r : { ...r, categoryId: firstId })))
+  }, [categs])
 
   if (!open) return null
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault()
-    onSave?.({ amount, date, category, note })
-    onClose()
+  const setRow = (index: number, patch: Partial<EntryRow>) => {
+    setRows((prev) => prev.map((r, i) => (i === index ? { ...r, ...patch } : r)))
   }
 
-  const setYesterday = () => {
-    const d = new Date()
-    d.setDate(d.getDate() - 1)
-    setDate(d.toISOString().slice(0, 10))
+  const addRow = () => {
+    setRows((prev) => [...prev, emptyRow(categs[0]?.transactionCategoryId ?? 0)])
+  }
+
+  const removeRow = (index: number) => {
+    setRows((prev) => prev.filter((_, i) => i !== index))
+  }
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault()
+
+    const payload = rows
+      .filter((r) => r.amount && Number(r.amount) > 0 && r.date && r.categoryId)
+      .map((r) => ({
+        expenseDate: r.date,
+        amount: Number(r.amount),
+        note: r.note ? r.note : null,
+        categoryId: r.categoryId,
+      }))
+
+    if (payload.length === 0) {
+      setSubmitError('Informe valor, data e categoria em pelo menos um lançamento.')
+      return
+    }
+
+    try {
+      setSaving(true)
+      setSubmitError(null)
+      await createDailyExpenses(payload)
+      onSaved?.()
+      onClose()
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : 'Erro ao salvar despesas.')
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -37,9 +110,9 @@ export default function AddExpenseModal({ open, onClose, onSave }: AddExpenseMod
         onClick={onClose}
       />
       {/* Modal Content */}
-      <div className="bg-surface-container-lowest border border-border-subtle rounded-xl w-full max-w-md mx-4 p-6 shadow-xl relative z-10 flex flex-col gap-6">
-        <div className="flex justify-between items-center">
-          <h3 className="font-title-md text-xl font-semibold text-on-surface">New Expense Entry</h3>
+      <div className="bg-surface-container-lowest border border-border-subtle rounded-xl w-full max-w-md mx-4 max-h-[85vh] flex flex-col shadow-xl relative z-10">
+        <div className="flex justify-between items-center px-6 py-4 border-b border-border-subtle flex-shrink-0">
+          <h3 className="font-title-md text-xl font-semibold text-on-surface">New Expense Entries</h3>
           <button
             onClick={onClose}
             className="text-on-surface-variant hover:text-on-surface transition-colors"
@@ -47,85 +120,103 @@ export default function AddExpenseModal({ open, onClose, onSave }: AddExpenseMod
             <span className="material-symbols-outlined">close</span>
           </button>
         </div>
-        <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
-          <div className="flex flex-col gap-1">
-            <label className="font-label-caps text-xs font-semibold text-on-surface-variant">
-              Amount
-            </label>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface font-label-numeric">
-                $
-              </span>
-              <input
-                className="w-full pl-8 pr-3 py-2 bg-surface-container-lowest border border-border-subtle rounded-lg font-label-numeric text-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
-                placeholder="0.00"
-                step="0.01"
-                type="number"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-              />
-            </div>
-          </div>
 
-          <div className="flex flex-col gap-1">
-            <label className="font-label-caps text-xs font-semibold text-on-surface-variant">
-              Date
-            </label>
-            <input
-              className="w-full px-3 py-2 bg-surface-container-lowest border border-border-subtle rounded-lg font-body-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-            />
-            <div className="flex gap-2 mt-1">
-              <button
-                type="button"
-                onClick={() => setDate(today)}
-                className="text-[10px] font-label-caps px-2 py-1 bg-surface-container rounded text-on-surface-variant hover:bg-surface-variant"
-              >
-                Today
-              </button>
-              <button
-                type="button"
-                onClick={setYesterday}
-                className="text-[10px] font-label-caps px-2 py-1 bg-surface-container rounded text-on-surface-variant hover:bg-surface-variant"
-              >
-                Yesterday
-              </button>
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-1">
-            <label className="font-label-caps text-xs font-semibold text-on-surface-variant">
-              Category
-            </label>
-            <select
-              className="w-full px-3 py-2 bg-surface-container-lowest border border-border-subtle rounded-lg font-body-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all appearance-none"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
+        <form className="flex flex-col gap-3 overflow-y-auto p-6" onSubmit={handleSubmit}>
+          {rows.map((row, index) => (
+            <div
+              key={index}
+              className="border border-border-subtle rounded-lg p-3 flex flex-col gap-2 relative"
             >
-              {categories.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name.charAt(0).toUpperCase() + c.name.slice(1)}
-                </option>
-              ))}
-            </select>
-          </div>
+              <div className="flex items-center justify-between">
+                <span className="font-label-caps text-[10px] font-semibold text-on-surface-variant uppercase">
+                  Entry {index + 1}
+                </span>
+                {rows.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removeRow(index)}
+                    className="text-on-surface-variant hover:text-negative-rose transition-colors"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">delete</span>
+                  </button>
+                )}
+              </div>
 
-          <div className="flex flex-col gap-1">
-            <label className="font-label-caps text-xs font-semibold text-on-surface-variant">
-              Note (Optional)
-            </label>
-            <textarea
-              className="w-full px-3 py-2 bg-surface-container-lowest border border-border-subtle rounded-lg font-body-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all resize-none"
-              placeholder="Brief description..."
-              rows={2}
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-            />
-          </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="flex flex-col gap-1">
+                  <label className="font-label-caps text-[10px] font-semibold text-on-surface-variant">
+                    Date
+                  </label>
+                  <input
+                    type="date"
+                    value={row.date}
+                    onChange={(e) => setRow(index, { date: e.target.value })}
+                    className="w-full px-2 py-1.5 bg-surface-container-lowest border border-border-subtle rounded-lg font-body-sm text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                  />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="font-label-caps text-[10px] font-semibold text-on-surface-variant">
+                    Amount
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    placeholder="0.00"
+                    value={row.amount}
+                    onChange={(e) => setRow(index, { amount: e.target.value })}
+                    className="w-full px-2 py-1.5 bg-surface-container-lowest border border-border-subtle rounded-lg font-label-numeric text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                  />
+                </div>
+              </div>
 
-          <div className="flex justify-end gap-1 mt-3 pt-3 border-t border-border-subtle">
+              <div className="flex flex-col gap-1">
+                <label className="font-label-caps text-[10px] font-semibold text-on-surface-variant">
+                  Category
+                </label>
+                <select
+                  value={row.categoryId}
+                  onChange={(e) => setRow(index, { categoryId: Number(e.target.value) })}
+                  className="w-full px-2 py-1.5 bg-surface-container-lowest border border-border-subtle rounded-lg font-body-sm text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all appearance-none"
+                >
+                  {categs.length === 0 && <option value="">Carregando categorias...</option>}
+                  {categs.map((c) => (
+                    <option key={c.transactionCategoryId} value={c.transactionCategoryId}>
+                      {c.name.charAt(0).toUpperCase() + c.name.slice(1)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label className="font-label-caps text-[10px] font-semibold text-on-surface-variant">
+                  Note (Optional)
+                </label>
+                <input
+                  type="text"
+                  placeholder="Brief description..."
+                  value={row.note}
+                  onChange={(e) => setRow(index, { note: e.target.value })}
+                  className="w-full px-2 py-1.5 bg-surface-container-lowest border border-border-subtle rounded-lg font-body-sm text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                />
+              </div>
+            </div>
+          ))}
+
+          <button
+            type="button"
+            onClick={addRow}
+            className="flex items-center justify-center gap-2 border border-dashed border-border-subtle rounded-lg py-2 font-label-caps text-xs font-semibold text-primary hover:bg-surface-container-low transition-colors"
+          >
+            <span className="material-symbols-outlined text-[16px]">add</span>
+            Add entry
+          </button>
+
+          {submitError && (
+            <p className="font-body-sm text-sm text-negative-rose">{submitError}</p>
+          )}
+
+          <div className="flex justify-end gap-1 mt-3 pt-3 border-t border-border-subtle flex-shrink-0">
             <button
               type="button"
               onClick={onClose}
@@ -135,9 +226,10 @@ export default function AddExpenseModal({ open, onClose, onSave }: AddExpenseMod
             </button>
             <button
               type="submit"
-              className="px-4 py-2 font-label-caps text-xs font-semibold bg-primary text-on-primary rounded-lg shadow-sm hover:bg-primary-container transition-colors active:scale-95 duration-200"
+              disabled={saving || categs.length === 0}
+              className="px-4 py-2 font-label-caps text-xs font-semibold bg-primary text-on-primary rounded-lg shadow-sm hover:bg-primary-container transition-colors active:scale-95 duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              Save Expense
+              {saving ? 'Saving...' : 'Save Entries'}
             </button>
           </div>
         </form>
