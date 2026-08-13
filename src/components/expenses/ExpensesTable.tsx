@@ -2,6 +2,8 @@ import type { Expense } from "../../types";
 
 interface ExpensesTableProps {
     expenses: Expense[];
+    onEdit?: (expense: Expense) => void;
+    onDelete?: (expense: Expense) => void;
 }
 
 const categoryPillClasses: Record<string, string> = {
@@ -10,7 +12,7 @@ const categoryPillClasses: Record<string, string> = {
     uber: "bg-surface-tint/10 text-surface-tint",
 };
 
-export default function ExpensesTable({ expenses }: ExpensesTableProps) {
+export default function ExpensesTable({ expenses, onEdit, onDelete }: ExpensesTableProps) {
     return (
         <div className="lg:col-span-2 bg-surface-container-lowest border border-border-subtle rounded-xl p-0 overflow-hidden flex flex-col">
             <div className="overflow-x-auto flex-grow">
@@ -21,6 +23,7 @@ export default function ExpensesTable({ expenses }: ExpensesTableProps) {
                             <th className="py-3 px-6 font-label-caps text-xs text-on-surface-variant font-semibold">Description</th>
                             <th className="py-3 px-6 font-label-caps text-xs text-on-surface-variant font-semibold">Category</th>
                             <th className="py-3 px-6 font-label-caps text-xs text-on-surface-variant font-semibold text-right">Amount</th>
+                            <th className="py-3 px-6 font-label-caps text-xs text-on-surface-variant font-semibold text-right">Actions</th>
                         </tr>
                     </thead>
                     <tbody className="font-body-sm text-sm">
@@ -45,6 +48,26 @@ export default function ExpensesTable({ expenses }: ExpensesTableProps) {
                                 </td>
                                 <td className="py-3 px-6 text-right font-label-numeric text-sm font-medium text-on-surface">
                                     -${expense.amount.toFixed(2)}
+                                </td>
+                                <td className="py-3 px-6 text-right">
+                                    <div className="inline-flex items-center justify-end gap-1">
+                                        <button
+                                            type="button"
+                                            title="Edit"
+                                            onClick={() => onEdit?.(expense)}
+                                            className="text-on-surface-variant hover:text-primary transition-colors p-1 rounded"
+                                        >
+                                            <span className="material-symbols-outlined text-[18px]">edit</span>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            title="Delete"
+                                            onClick={() => onDelete?.(expense)}
+                                            className="text-on-surface-variant hover:text-negative-rose transition-colors p-1 rounded"
+                                        >
+                                            <span className="material-symbols-outlined text-[18px]">delete</span>
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         ))}
