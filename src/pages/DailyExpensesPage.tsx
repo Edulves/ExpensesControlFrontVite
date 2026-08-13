@@ -4,7 +4,8 @@ import AppShell from "../components/layout/AppShell";
 import ExpensesTable from "../components/expenses/ExpensesTable";
 import QuickStatsPanel from "../components/expenses/QuickStatsPanel";
 import AddExpenseModal from "../components/expenses/AddExpenseModal";
-import { fetchDailyExpenses, fetchExpensesPerCategory, type ExpenseByCategory } from "../services/api";
+import EditExpenseModal from "../components/expenses/EditExpenseModal";
+import { fetchDailyExpenses, fetchExpensesPerCategory, deleteDailyExpense, type ExpenseByCategory } from "../services/api";
 import { getCookie } from "../utils/cookies";
 import type { Expense } from "../types";
 import { categories } from "../data";
@@ -15,6 +16,7 @@ export default function DailyExpensesPage() {
     const navigate = useNavigate();
     const now = new Date();
     const [modalOpen, setModalOpen] = useState(false);
+    const [editing, setEditing] = useState<Expense | null>(null);
     const [expenses, setExpenses] = useState<Expense[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -137,6 +139,21 @@ export default function DailyExpensesPage() {
         setAppliedCategory(category);
         setAppliedNote(note);
         setPage(1);
+    };
+
+    const handleEdit = (expense: Expense) => {
+        setEditing(expense);
+    };
+
+    const handleDelete = async (expense: Expense) => {
+        if (!window.confirm("Excluir esta despesa?")) return;
+        try {
+            await deleteDailyExpense(Number(expense.id));
+            setPage(1);
+            loadData();
+        } catch (err) {
+            window.alert(err instanceof Error ? err.message : "Erro ao excluir despesa.");
+        }
     };
 
     return (
@@ -287,7 +304,7 @@ export default function DailyExpensesPage() {
                 </div>
             ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <ExpensesTable expenses={expenses} />
+                    <ExpensesTable expenses={expenses} onEdit={handleEdit} onDelete={handleDelete} />
                     <QuickStatsPanel totalToday={totalToday} topCategories={topCategories} />
                 </div>
             )}
@@ -338,7 +355,8 @@ export default function DailyExpensesPage() {
                 </div>
             )}
 
-            <AddExpenseModal open={modalOpen} onClose={() => setModalOpen(false)} />
+            <AddExpenseModal open={modalOpen} onClose={() => setModalOpen(false)} onSaved={() => { setPage(1); loadData(); }} />
+            <EditExpenseModal open={editing !== null} expense={editing} onClose={() => setEditing(null)} onSaved={() => { setPage(1); loadData(); }} />
 
             {/* Mobile FAB for adding expense */}
             <button
