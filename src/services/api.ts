@@ -194,3 +194,131 @@ export async function fetchExpensesPerCategory(filters: {
         })),
     };
 }
+
+export interface TransactionCategory {
+    transactionCategoryId: number;
+    name: string;
+}
+
+export interface CreateDailyExpenseEntry {
+    expenseDate: string;
+    amount: number;
+    note?: string | null;
+    categoryId: number;
+}
+
+export async function fetchTransactionCategories(): Promise<TransactionCategory[]> {
+    const token = getCookie("authToken");
+
+    if (!token) {
+        throw new Error("Token de autenticação não encontrado. Faça login novamente.");
+    }
+
+    const response = await fetch(`${API_BASE_URL}/TransactionCategories`, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error(`Falha ao buscar categorias (status ${response.status})`);
+    }
+
+    const data = await response.json();
+    const items = Array.isArray(data) ? data : data.items || data.data || data.categories || [];
+
+    return (items as { transactionCategoryId?: number; id?: number; name: string }[]).map((item) => ({
+        transactionCategoryId: item.transactionCategoryId ?? (item.id as number) ?? 0,
+        name: item.name,
+    }));
+}
+
+export async function createDailyExpenses(entries: CreateDailyExpenseEntry[]): Promise<void> {
+    const token = getCookie("authToken");
+
+    if (!token) {
+        throw new Error("Token de autenticação não encontrado. Faça login novamente.");
+    }
+
+    const response = await fetch(`${API_BASE_URL}/DailyExpenses`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(entries),
+    });
+
+    if (!response.ok) {
+        let detail = `Falha ao salvar despesas (status ${response.status})`;
+        try {
+            const errorData = await response.json();
+            detail = errorData?.detail || errorData?.title || detail;
+        } catch {
+            // corpo não-JSON; mantém a mensagem padrão
+        }
+        throw new Error(detail);
+    }
+}
+
+export interface UpdateDailyExpenseEntry {
+    dailyExpenseId: number;
+    expenseDate: string;
+    expenseValue: number;
+    note?: string;
+    categoryId: number;
+}
+
+export async function updateDailyExpenses(entries: UpdateDailyExpenseEntry[]): Promise<void> {
+    const token = getCookie("authToken");
+
+    if (!token) {
+        throw new Error("Token de autenticação não encontrado. Faça login novamente.");
+    }
+
+    const response = await fetch(`${API_BASE_URL}/DailyExpenses`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(entries),
+    });
+
+    if (!response.ok) {
+        let detail = `Falha ao atualizar despesas (status ${response.status})`;
+        try {
+            const errorData = await response.json();
+            detail = errorData?.detail || errorData?.title || detail;
+        } catch {
+            // corpo não-JSON; mantém a mensagem padrão
+        }
+        throw new Error(detail);
+    }
+}
+
+export async function deleteDailyExpense(id: number): Promise<void> {
+    const token = getCookie("authToken");
+
+    if (!token) {
+        throw new Error("Token de autenticação não encontrado. Faça login novamente.");
+    }
+
+    const response = await fetch(`${API_BASE_URL}/DailyExpenses/${id}?request=${id}`, {
+        method: "DELETE",
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    if (!response.ok) {
+        let detail = `Falha ao excluir despesa (status ${response.status})`;
+        try {
+            const errorData = await response.json();
+            detail = errorData?.detail || errorData?.title || detail;
+        } catch {
+            // corpo não-JSON; mantém a mensagem padrão
+        }
+        throw new Error(detail);
+    }
+}
