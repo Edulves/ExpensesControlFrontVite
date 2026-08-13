@@ -1,3 +1,4 @@
+import { useRef, useState, type MouseEvent } from 'react'
 import type { CategoryBreakdownItem } from '../../types'
 
 interface CategoryDonutChartProps {
@@ -7,10 +8,16 @@ interface CategoryDonutChartProps {
 
 // Map the tailwind background classes used in the legend to real colors for the conic-gradient.
 const colorHex: Record<string, string> = {
-  'bg-negative-rose': '#F43F5E',
-  'bg-warning-amber': '#F59E0B',
-  'bg-outline': '#73777e',
   'bg-secondary-fixed-dim': '#4edea3',
+  'bg-warning-amber': '#F59E0B',
+  'bg-negative-rose': '#F43F5E',
+  'bg-tertiary-fixed-dim': '#4cd7f6',
+  'bg-positive-emerald': '#10B981',
+  'bg-surface-tint': '#46607d',
+  'bg-inverse-primary': '#aec9ea',
+  'bg-secondary-fixed': '#6ffbbe',
+  'bg-outline': '#73777e',
+  'bg-on-primary-container': '#7893b2',
 }
 
 function buildGradient(items: CategoryBreakdownItem[]) {
@@ -28,34 +35,73 @@ export default function CategoryDonutChart({
   items,
   topCategoryLabel,
 }: CategoryDonutChartProps) {
+  const donutRef = useRef<HTMLDivElement>(null)
+  const [hovered, setHovered] = useState<CategoryBreakdownItem | null>(null)
+
+  // Determina qual segmento da rosca está sob o cursor, convertendo a posição
+  // do mouse em um ângulo e comparando com os percentuais acumulados (o
+  // conic-gradient inicia no topo e avança no sentido horário).
+  const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
+    const el = donutRef.current
+    if (!el || items.length === 0) {
+      setHovered(null)
+      return
+    }
+
+    const rect = el.getBoundingClientRect()
+    const cx = rect.left + rect.width / 2
+    const cy = rect.top + rect.height / 2
+    const dx = e.clientX - cx
+    const dy = e.clientY - cy
+    const radius = rect.width / 2
+    const distance = Math.hypot(dx, dy)
+
+    // O "buraco" central usa inset-2 (8px); ignora o hover sobre ele.
+    if (distance < radius - 8) {
+      setHovered(null)
+      return
+    }
+
+    let angle = Math.atan2(dy, dx) * (180 / Math.PI)
+    const cwDeg = (angle + 90 + 360) % 360
+
+    let cumulative = 0
+    let found: CategoryBreakdownItem | null = null
+    for (const item of items) {
+      const start = cumulative * 3.6
+      const end = (cumulative + item.percent) * 3.6
+      if (cwDeg >= start && cwDeg < end) {
+        found = item
+        break
+      }
+      cumulative += item.percent
+    }
+
+    setHovered(found)
+  }
+
+  const handleMouseLeave = () => setHovered(null)
+
   return (
     <div className="bg-surface-container-lowest border border-border-subtle rounded-xl p-6 flex flex-col items-center justify-center h-full min-h-[300px]">
       <h3 className="font-title-md text-xl font-semibold text-primary w-full text-left mb-3 border-b border-border-subtle pb-2">
         Category Breakdown
       </h3>
       <div
-        className="relative w-48 h-48 rounded-full flex items-center justify-center mt-4"
+        ref={donutRef}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        className="relative w-48 h-48 rounded-full flex items-center justify-center mt-4 cursor-pointer select-none"
         style={{ background: buildGradient(items) }}
       >
-        <div className="absolute inset-2 bg-surface-container-lowest rounded-full flex flex-col items-center justify-center">
-          <span className="font-label-caps text-xs font-semibold text-outline">Top Category</span>
-          <span className="font-title-md text-xl font-semibold text-primary">{topCategoryLabel}</span>
+        <div className="absolute inset-2 bg-surface-container-lowest rounded-full flex flex-col items-center justify-center pointer-events-none text-center px-3">
+          <span className="font-label-caps text-xs font-semibold text-outline truncate max-w-full">
+            {hovered ? hovered.label.toUpperCase() : 'Top Category'}
+          </span>
+          <span className="font-title-md text-xl font-semibold text-primary truncate max-w-full">
+            {hovered ? `${hovered.percent}%` : topCategoryLabel}
+          </span>
         </div>
-      </div>
-      <div className="mt-6 w-full space-y-2">
-        {items.map((item) => (
-          <div key={item.categoryId} className="flex justify-between items-center text-sm">
-            <div className="flex items-center gap-2">
-              <div className={`w-3 h-3 rounded-full ${item.color}`} />
-              <span className="font-body-sm text-sm text-on-surface-variant">
-                {item.label} ({item.percent}%)
-              </span>
-            </div>
-            <span className="font-label-numeric text-sm font-medium">
-              -${item.amount.toFixed(2)}
-            </span>
-          </div>
-        ))}
       </div>
     </div>
   )

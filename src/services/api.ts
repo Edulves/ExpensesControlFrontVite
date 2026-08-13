@@ -116,7 +116,13 @@ const CATEGORY_COLORS = [
     "bg-secondary-fixed-dim",
     "bg-warning-amber",
     "bg-negative-rose",
+    "bg-tertiary-fixed-dim",
+    "bg-positive-emerald",
+    "bg-surface-tint",
+    "bg-inverse-primary",
+    "bg-secondary-fixed",
     "bg-outline",
+    "bg-on-primary-container",
 ];
 
 export async function fetchExpensesPerCategory(filters: {
