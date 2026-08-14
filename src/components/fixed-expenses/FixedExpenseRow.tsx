@@ -38,7 +38,7 @@ export default function FixedExpenseRow({ expense }: FixedExpenseRowProps) {
         }`}
       >
         <span className="md:hidden text-on-surface-variant">Amount:</span>
-        <span>${expense.amount.toFixed(2)}</span>
+        <span>{expense.amount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
       </div>
 
       <div className="col-span-1 md:col-span-2 flex justify-start md:justify-center">

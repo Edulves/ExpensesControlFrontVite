@@ -86,19 +86,19 @@ export default function DashboardPage() {
             accentColor="bg-negative-rose"
           >
             <span className="font-display-lg text-5xl font-bold text-primary">
-              $<span className="font-label-numeric">4,250.00</span>
+              R$ <span className="font-label-numeric">4.250,00</span>
             </span>
           </StatCard>
 
           <StatCard label="Fixed Expenses" sublabel="Upcoming 7 days" icon="event_repeat">
             <span className="font-title-md text-xl font-semibold text-primary">
-              $<span className="font-label-numeric">1,120.00</span>
+              R$ <span className="font-label-numeric">1.120,00</span>
             </span>
           </StatCard>
 
           <StatCard label="Estimated Remaining" sublabel="Based on fixed" icon="savings">
             <span className="font-title-md text-xl font-semibold text-positive-emerald">
-              $<span className="font-label-numeric">850.00</span>
+              R$ <span className="font-label-numeric">850,00</span>
             </span>
           </StatCard>
         </div>

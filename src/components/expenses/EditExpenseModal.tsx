@@ -106,15 +106,15 @@ return (
           <div className="flex flex-col gap-1">
             <label className="font-label-caps text-xs font-semibold text-on-surface-variant">Amount</label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface font-label-numeric">$</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface font-label-numeric text-sm">R$</span>
               <input
                 type="number"
                 min="0"
                 step="0.01"
-                placeholder="0.00"
+                placeholder="0,00"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                className="w-full pl-8 pr-3 py-2 bg-surface-container-lowest border border-border-subtle rounded-lg font-label-numeric text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                className="w-full pl-10 pr-3 py-2 bg-surface-container-lowest border border-border-subtle rounded-lg font-label-numeric text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
               />
             </div>
           </div>

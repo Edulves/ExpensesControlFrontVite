@@ -18,8 +18,8 @@ export default function FixedExpensesPage() {
             </span>
           </div>
           <div className="font-display-lg text-5xl font-bold text-primary mt-2">
-            <span className="font-label-numeric text-xl font-semibold align-top">$</span>
-            1,450<span className="font-label-numeric text-xl font-semibold">.00</span>
+            <span className="font-label-numeric text-xl font-semibold align-top">R$</span>
+            1.450<span className="font-label-numeric text-xl font-semibold">,00</span>
           </div>
         </div>
 
@@ -33,8 +33,8 @@ export default function FixedExpensesPage() {
             </span>
           </div>
           <div className="font-display-lg text-5xl font-bold text-on-background mt-2">
-            <span className="font-label-numeric text-xl font-semibold align-top">$</span>
-            850<span className="font-label-numeric text-xl font-semibold">.00</span>
+            <span className="font-label-numeric text-xl font-semibold align-top">R$</span>
+            850<span className="font-label-numeric text-xl font-semibold">,00</span>
           </div>
           <div className="w-full bg-surface-container-high rounded-full h-1.5 mt-4">
             <div className="bg-positive-emerald h-1.5 rounded-full" style={{ width: '58%' }} />
@@ -49,8 +49,8 @@ export default function FixedExpensesPage() {
             </span>
           </div>
           <div className="font-display-lg text-5xl font-bold text-on-background mt-2">
-            <span className="font-label-numeric text-xl font-semibold align-top">$</span>
-            120<span className="font-label-numeric text-xl font-semibold">.00</span>
+            <span className="font-label-numeric text-xl font-semibold align-top">R$</span>
+            120<span className="font-label-numeric text-xl font-semibold">,00</span>
           </div>
           <p className="font-body-sm text-sm text-on-surface-variant mt-2">
             2 bills pending

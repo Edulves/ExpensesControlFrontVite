@@ -35,7 +35,7 @@ export default function QuickStatsPanel({ totalToday, topCategories }: QuickStat
                                 <div className={`w-2 h-2 rounded-full ${category.color}`} />
                                 <span className="font-body-sm text-on-surface">{category.label}</span>
                             </div>
-                            <span className="font-label-numeric text-sm font-medium text-on-surface-variant">${category.amount.toFixed(2)}</span>
+                            <span className="font-label-numeric text-sm font-medium text-on-surface-variant">{category.amount.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</span>
                         </li>
                     ))}
                 </ul>

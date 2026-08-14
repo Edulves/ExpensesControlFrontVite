@@ -162,7 +162,7 @@ export default function AddExpenseModal({ open, onClose, onSaved }: AddExpenseMo
                     type="number"
                     min="0"
                     step="0.01"
-                    placeholder="0.00"
+                    placeholder="0,00"
                     value={row.amount}
                     onChange={(e) => setRow(index, { amount: e.target.value })}
                     className="w-full px-2 py-1.5 bg-surface-container-lowest border border-border-subtle rounded-lg font-label-numeric text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"

@@ -47,7 +47,10 @@ export default function ExpensesTable({ expenses, onEdit, onDelete }: ExpensesTa
                                     </span>
                                 </td>
                                 <td className="py-3 px-6 text-right font-label-numeric text-sm font-medium text-on-surface">
-                                    -${expense.amount.toFixed(2)}
+                                    {(-expense.amount).toLocaleString("pt-BR", {
+                                        style: "currency",
+                                        currency: "BRL",
+                                    })}
                                 </td>
                                 <td className="py-3 px-6 text-right">
                                     <div className="inline-flex items-center justify-end gap-1">
