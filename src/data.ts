@@ -10,7 +10,6 @@ export const navItems: NavItem[] = [
   { label: 'Dashboard', icon: 'dashboard', path: '/dashboard' },
   { label: 'Registro de Despesas', icon: 'receipt_long', path: '/expenses' },
   { label: 'Despesas Fixas', icon: 'calendar_today', path: '/fixed-expenses' },
-  { label: 'Categorias', icon: 'category', path: '/categories' },
 ]
 
 export const categories: Category[] = [

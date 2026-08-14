@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import AppShell from '../components/layout/AppShell'
 import StatCard from '../components/ui/StatCard'
 import RecentExpensesList from '../components/dashboard/RecentExpensesList'
-import CategoryDonutChart from '../components/dashboard/CategoryDonutChart'
-import { fetchExpensesPerCategory, fetchTotalDailyExpenses, type ExpenseByCategory } from '../services/api'
+import CategoryHorizontalBarChart from '../components/dashboard/CategoryHorizontalBarChart'
+import { fetchExpensesPerCategory, fetchTotalDailyExpenses, fetchFixedExpensesConsolidation, type ExpenseByCategory } from '../services/api'
 import { getCookie } from '../utils/cookies'
 import type { CategoryBreakdownItem } from '../types'
 
@@ -48,6 +48,8 @@ export default function DashboardPage() {
   const [breakdownItems, setBreakdownItems] = useState<CategoryBreakdownItem[]>([])
   const [topCategoryLabel, setTopCategoryLabel] = useState('—')
   const [totalExpenses, setTotalExpenses] = useState(0)
+  const [fixedPaid, setFixedPaid] = useState(0)
+  const [fixedPending, setFixedPending] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [notAuthenticated, setNotAuthenticated] = useState(false)
@@ -83,12 +85,15 @@ export default function DashboardPage() {
       setLoading(true)
       setError(null)
 
-      const [data, total] = await Promise.all([
+      const [data, total, consolidation] = await Promise.all([
         fetchExpensesPerCategory({ month: monthToUse, year: yearToUse }),
         fetchTotalDailyExpenses({ month: monthToUse, year: yearToUse }),
+        fetchFixedExpensesConsolidation(monthToUse, yearToUse),
       ])
 
       setTotalExpenses(total)
+      setFixedPaid(consolidation.paidValue)
+      setFixedPending(consolidation.notPaidValue)
       setBreakdownItems(toBreakdownItems(data.categories, data.total))
 
       // Categoria com maior valor consolidado é exibida no centro do donut.
@@ -111,6 +116,7 @@ export default function DashboardPage() {
 
   return (
     <AppShell title="Dashboard">
+      <div className="flex flex-col h-full min-h-0">
       {/* Filters: Mês e Ano */}
       <div className="flex flex-wrap items-end justify-between gap-3 mb-6 -mt-2">
         <div className="flex flex-wrap items-end gap-3">
@@ -160,7 +166,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-12 gap-6 grid-rows-[auto_1fr]">
         {/* Summary Cards Row */}
         <div className="lg:col-span-12 grid grid-cols-1 md:grid-cols-3 gap-6">
           <StatCard
@@ -180,35 +186,36 @@ export default function DashboardPage() {
             </span>
           </StatCard>
 
-          <StatCard label="Despesas Fixas" sublabel="Próximos 7 dias" icon="event_repeat">
+          <StatCard label="Despesas Fixas" sublabel="Valor pago no mês" icon="event_repeat">
             <span className="font-title-md text-xl font-semibold text-primary">
-              R$ <span className="font-label-numeric">1.120,00</span>
+              R$ <span className="font-label-numeric">{fixedPaid.toLocaleString('pt-BR', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}</span>
             </span>
           </StatCard>
 
-          <StatCard label="Estimativa Restante" sublabel="Com base nas fixas" icon="savings">
+          <StatCard label="Estimativa Restante" sublabel="Valor pendente no mês" icon="savings">
             <span className="font-title-md text-xl font-semibold text-positive-emerald">
-              R$ <span className="font-label-numeric">850,00</span>
+              R$ <span className="font-label-numeric">{fixedPending.toLocaleString('pt-BR', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}</span>
             </span>
           </StatCard>
         </div>
 
-        {/* Recent Expenses */}
-        <div className="lg:col-span-8 grid grid-cols-1 gap-6">
-          <RecentExpensesList items={breakdownItems} />
-        </div>
-
-        {/* Category Breakdown */}
-        <div className="lg:col-span-4 grid grid-cols-1 gap-6">
+        {/* Category Breakdown (Principal) */}
+        <div className="lg:col-span-12 min-h-0 flex flex-col">
           {loading ? (
-            <div className="bg-surface-container-lowest border border-border-subtle rounded-xl p-6 flex flex-col items-center justify-center h-full min-h-[300px]">
+            <div className="bg-surface-container-lowest border border-border-subtle rounded-xl p-6 flex flex-col items-center justify-center flex-1 min-h-0">
               <span className="inline-block w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
               <p className="font-body-sm text-sm text-on-surface-variant mt-3">
                 Carregando categorias...
               </p>
             </div>
           ) : error ? (
-            <div className="bg-surface-container-lowest border border-negative-rose rounded-xl p-6 flex flex-col items-center justify-center text-center h-full min-h-[300px]">
+            <div className="bg-surface-container-lowest border border-negative-rose rounded-xl p-6 flex flex-col items-center justify-center text-center flex-1 min-h-0">
               <p className="font-body-lg text-base text-negative-rose mb-1">Erro</p>
               <p className="font-body-sm text-sm text-on-surface-variant mb-4">{error}</p>
               <button
@@ -220,9 +227,13 @@ export default function DashboardPage() {
               </button>
             </div>
           ) : (
-            <CategoryDonutChart items={breakdownItems} topCategoryLabel={topCategoryLabel} />
+            <CategoryHorizontalBarChart
+              items={breakdownItems}
+              topCategoryLabel={topCategoryLabel}
+            />
           )}
         </div>
+      </div>
       </div>
 
       {/* Not Authenticated Popup */}

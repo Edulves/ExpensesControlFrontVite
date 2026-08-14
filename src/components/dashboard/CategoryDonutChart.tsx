@@ -5,6 +5,7 @@ import { colorHex } from './categoryColors'
 interface CategoryDonutChartProps {
   items: CategoryBreakdownItem[]
   topCategoryLabel: string
+  onHoverChange?: (item: CategoryBreakdownItem | null) => void
 }
 
 function buildGradient(items: CategoryBreakdownItem[]) {
@@ -21,6 +22,7 @@ function buildGradient(items: CategoryBreakdownItem[]) {
 export default function CategoryDonutChart({
   items,
   topCategoryLabel,
+  onHoverChange,
 }: CategoryDonutChartProps) {
   const donutRef = useRef<HTMLDivElement>(null)
   const [hovered, setHovered] = useState<CategoryBreakdownItem | null>(null)
@@ -32,6 +34,7 @@ export default function CategoryDonutChart({
     const el = donutRef.current
     if (!el || items.length === 0) {
       setHovered(null)
+      onHoverChange?.(null)
       return
     }
 
@@ -43,9 +46,10 @@ export default function CategoryDonutChart({
     const radius = rect.width / 2
     const distance = Math.hypot(dx, dy)
 
-    // O "buraco" central usa inset-2 (8px); ignora o hover sobre ele.
-    if (distance < radius - 8) {
+// O "buraco" central usa inset-[16px]; ignora o hover sobre ele.
+    if (distance < radius - 16) {
       setHovered(null)
+      onHoverChange?.(null)
       return
     }
 
@@ -65,12 +69,16 @@ export default function CategoryDonutChart({
     }
 
     setHovered(found)
+    onHoverChange?.(found)
   }
 
-  const handleMouseLeave = () => setHovered(null)
+  const handleMouseLeave = () => {
+    setHovered(null)
+    onHoverChange?.(null)
+  }
 
   return (
-    <div className="bg-surface-container-lowest border border-border-subtle rounded-xl p-6 flex flex-col items-center justify-center h-full min-h-[300px]">
+    <div className="bg-surface-container-lowest border border-border-subtle rounded-xl p-6 flex flex-col items-center justify-center flex-1 min-h-0">
       <h3 className="font-title-md text-xl font-semibold text-primary w-full text-left mb-3 border-b border-border-subtle pb-2">
         Participação por Categoria
       </h3>
@@ -78,10 +86,10 @@ export default function CategoryDonutChart({
         ref={donutRef}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        className="relative w-48 h-48 rounded-full flex items-center justify-center mt-4 cursor-pointer select-none"
+        className="relative w-full max-w-[320px] aspect-square rounded-full flex items-center justify-center cursor-pointer select-none"
         style={{ background: buildGradient(items) }}
       >
-        <div className="absolute inset-2 bg-surface-container-lowest rounded-full flex flex-col items-center justify-center pointer-events-none text-center px-3">
+        <div className="absolute inset-[16px] bg-surface-container-lowest rounded-full flex flex-col items-center justify-center pointer-events-none text-center px-3">
           <span className="font-label-caps text-xs font-semibold text-outline truncate max-w-full">
             {hovered ? hovered.label.toUpperCase() : 'Categoria Principal'}
           </span>

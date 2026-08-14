@@ -1,5 +1,6 @@
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import { navItems } from '../../data'
+import { deleteCookie } from '../../utils/cookies'
 
 interface MobileNavDrawerProps {
   open: boolean
@@ -7,6 +8,14 @@ interface MobileNavDrawerProps {
 }
 
 export default function MobileNavDrawer({ open, onClose }: MobileNavDrawerProps) {
+  const navigate = useNavigate()
+
+  const handleLogout = () => {
+    deleteCookie('authToken')
+    deleteCookie('tokenExpiration')
+    navigate('/login')
+  }
+
   if (!open) return null
 
   return (
@@ -68,6 +77,10 @@ export default function MobileNavDrawer({ open, onClose }: MobileNavDrawerProps)
         <div className="mt-auto pt-3 border-t border-border-subtle space-y-1">
           <a
             href="#"
+            onClick={(e) => {
+              e.preventDefault()
+              handleLogout()
+            }}
             className="flex items-center gap-3 px-2 py-1 rounded-lg text-on-surface-variant opacity-70 hover:bg-surface-container-low transition-all font-label-caps text-xs font-semibold"
           >
             <span className="material-symbols-outlined">logout</span>
