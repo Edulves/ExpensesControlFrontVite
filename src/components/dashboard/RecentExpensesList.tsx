@@ -40,11 +40,8 @@ export default function RecentExpensesList({ items }: RecentExpensesListProps) {
     <div className="bg-surface-container-lowest border border-border-subtle rounded-xl flex flex-col overflow-hidden">
       <div className="p-3 border-b border-border-subtle flex justify-between items-center bg-surface-bright">
         <h2 className="font-title-md text-xl font-semibold text-primary">Despesas Por Categoria</h2>
-        <button className="text-primary font-label-caps text-xs font-semibold hover:underline">
-          View All
-        </button>
       </div>
-      <div className="flex-1 overflow-y-auto max-h-[400px] p-4">
+      <div className="flex-1 overflow-y-auto max-h-[600px] p-4">
         {items.length === 0 && (
           <p className="font-body-sm text-sm text-on-surface-variant p-6 text-center">
             Nenhuma categoria com gastos no período.
@@ -78,7 +75,10 @@ export default function RecentExpensesList({ items }: RecentExpensesListProps) {
                   </div>
                   <div className="text-right flex-shrink-0 pl-2">
                     <p className="font-label-numeric text-sm font-medium text-on-surface font-semibold">
-                      -${item.amount.toFixed(2)}
+                      {(-item.amount).toLocaleString('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL',
+                      })}
                     </p>
                     <p className="font-label-caps text-xs font-semibold" style={{ color: hex }}>
                       {item.percent}%
