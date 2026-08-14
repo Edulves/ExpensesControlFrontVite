@@ -71,8 +71,8 @@ export default function CategoryHorizontalBarChart({
               >
                 {/* Indicador de cor (bolinha) */}
                 <div
-                  className="w-3 h-3 rounded-full flex-shrink-0 ring-2 ring-offset-1"
-                  style={{ backgroundColor: hex, ringColor: hex }}
+                  className="w-3 h-3 rounded-full flex-shrink-0"
+                  style={{ backgroundColor: hex, outline: `2px solid ${hex}`, outlineOffset: '1px' }}
                 />
 
                 {/* Ícone */}
