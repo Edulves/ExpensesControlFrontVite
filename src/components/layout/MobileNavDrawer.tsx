@@ -25,7 +25,7 @@ export default function MobileNavDrawer({ open, onClose }: MobileNavDrawerProps)
               <h1 className="font-title-md text-xl font-semibold text-primary tracking-tight">
                 Controle de Despesas
               </h1>
-              <p className="font-body-sm text-sm text-on-surface-variant opacity-70">
+              <p className="font-label-md text-label-md text-on-surface-variant opacity-70">
                 Calma Financeira
               </p>
             </div>
@@ -46,7 +46,7 @@ export default function MobileNavDrawer({ open, onClose }: MobileNavDrawerProps)
               onClick={onClose}
               className={({ isActive }) =>
                 isActive
-                  ? 'flex items-center gap-3 px-2 py-1 rounded-lg bg-surface-container text-primary font-bold font-label-caps text-xs font-semibold'
+                  ? 'flex items-center gap-3 px-2 py-1 rounded-lg bg-surface-container text-primary font-bold font-label-md text-label-md font-semibold'
                   : 'flex items-center gap-3 px-2 py-1 rounded-lg text-on-surface-variant opacity-70 hover:bg-surface-container-low transition-all font-label-caps text-xs font-semibold'
               }
             >

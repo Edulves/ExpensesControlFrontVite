@@ -22,8 +22,8 @@ export default function FixedExpensesPage() {
     const [notAuthenticated, setNotAuthenticated] = useState(false);
 
     const fmtAmount = (value: number) => {
-        const f = value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        const [i, d] = f.split(',');
+        const f = value.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        const [i, d] = f.split(",");
         return { i, d };
     };
     const [showAddModal, setShowAddModal] = useState(false);
@@ -150,18 +150,18 @@ export default function FixedExpensesPage() {
                     </div>
                 </div>
 
-                    {/* Add Fixed Expense Button */}
-                    <div className="flex items-end gap-2">
-                        <button
-                            type="button"
-                            onClick={() => setShowAddModal(true)}
-                            className="inline-flex items-center gap-2 bg-primary text-on-primary font-label-caps text-xs font-semibold px-4 py-2 rounded-lg shadow-sm hover:bg-primary-container transition-colors active:scale-95 duration-200"
-                        >
-                            <span className="material-symbols-outlined text-[18px]">add</span>
-                            Nova Despesa Fixa
-                        </button>
-                    </div>
+                {/* Add Fixed Expense Button */}
+                <div className="flex items-end gap-2">
+                    <button
+                        type="button"
+                        onClick={() => setShowAddModal(true)}
+                        className="inline-flex items-center gap-2 bg-primary text-on-primary font-label-caps text-xs font-semibold px-4 py-2 rounded-lg shadow-sm hover:bg-primary-container transition-colors active:scale-95 duration-200"
+                    >
+                        <span className="material-symbols-outlined text-[18px]">add</span>
+                        Nova Despesa Fixa
+                    </button>
                 </div>
+            </div>
 
             {/* Bento Grid Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
@@ -178,7 +178,8 @@ export default function FixedExpensesPage() {
                         return (
                             <div className="font-display-lg text-5xl font-bold text-primary mt-2">
                                 <span className="font-label-numeric text-xl font-semibold align-top">R$</span>
-                                {i}<span className="font-label-numeric text-xl font-semibold">,{d}</span>
+                                {i}
+                                <span className="font-label-numeric text-xl font-semibold">,{d}</span>
                             </div>
                         );
                     })()}
@@ -198,7 +199,8 @@ export default function FixedExpensesPage() {
                             <div>
                                 <div className="font-display-lg text-5xl font-bold text-on-background mt-2">
                                     <span className="font-label-numeric text-xl font-semibold align-top">R$</span>
-                                    {i}<span className="font-label-numeric text-xl font-semibold">,{d}</span>
+                                    {i}
+                                    <span className="font-label-numeric text-xl font-semibold">,{d}</span>
                                 </div>
                                 <div className="w-full bg-surface-container-high rounded-full h-1.5 mt-4">
                                     <div className="bg-positive-emerald h-1.5 rounded-full" style={{ width: `${pct}%` }} />
@@ -219,7 +221,8 @@ export default function FixedExpensesPage() {
                         return (
                             <div className="font-display-lg text-5xl font-bold text-on-background mt-2">
                                 <span className="font-label-numeric text-xl font-semibold align-top">R$</span>
-                                {i}<span className="font-label-numeric text-xl font-semibold">,{d}</span>
+                                {i}
+                                <span className="font-label-numeric text-xl font-semibold">,{d}</span>
                             </div>
                         );
                     })()}
