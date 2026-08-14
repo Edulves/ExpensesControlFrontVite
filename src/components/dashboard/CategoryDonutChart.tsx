@@ -1,23 +1,10 @@
 import { useRef, useState, type MouseEvent } from 'react'
 import type { CategoryBreakdownItem } from '../../types'
+import { colorHex } from './categoryColors'
 
 interface CategoryDonutChartProps {
   items: CategoryBreakdownItem[]
   topCategoryLabel: string
-}
-
-// Map the tailwind background classes used in the legend to real colors for the conic-gradient.
-const colorHex: Record<string, string> = {
-  'bg-secondary-fixed-dim': '#4edea3',
-  'bg-warning-amber': '#F59E0B',
-  'bg-negative-rose': '#F43F5E',
-  'bg-tertiary-fixed-dim': '#4cd7f6',
-  'bg-positive-emerald': '#10B981',
-  'bg-surface-tint': '#46607d',
-  'bg-inverse-primary': '#aec9ea',
-  'bg-secondary-fixed': '#6ffbbe',
-  'bg-outline': '#73777e',
-  'bg-on-primary-container': '#7893b2',
 }
 
 function buildGradient(items: CategoryBreakdownItem[]) {
