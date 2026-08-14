@@ -4,9 +4,24 @@ import AppShell from '../components/layout/AppShell'
 import StatCard from '../components/ui/StatCard'
 import RecentExpensesList from '../components/dashboard/RecentExpensesList'
 import CategoryDonutChart from '../components/dashboard/CategoryDonutChart'
-import { fetchExpensesPerCategory, type ExpenseByCategory } from '../services/api'
+import { fetchExpensesPerCategory, fetchTotalDailyExpenses, type ExpenseByCategory } from '../services/api'
 import { getCookie } from '../utils/cookies'
 import type { CategoryBreakdownItem } from '../types'
+
+const MONTHS = [
+  'Janeiro',
+  'Fevereiro',
+  'Março',
+  'Abril',
+  'Maio',
+  'Junho',
+  'Julho',
+  'Agosto',
+  'Setembro',
+  'Outubro',
+  'Novembro',
+  'Dezembro',
+]
 
 // Converte o retorno da API (ExpenseByCategory[]) no formato esperado pelo
 // CategoryDonutChart (CategoryBreakdownItem[]), calculando o percentual de cada
@@ -32,11 +47,30 @@ export default function DashboardPage() {
 
   const [breakdownItems, setBreakdownItems] = useState<CategoryBreakdownItem[]>([])
   const [topCategoryLabel, setTopCategoryLabel] = useState('—')
+  const [totalExpenses, setTotalExpenses] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [notAuthenticated, setNotAuthenticated] = useState(false)
 
-  const loadCategoryBreakdown = async () => {
+  // Rascunho do filtro (Mês/Ano) e valores já aplicados aos endpoints.
+  const [month, setMonth] = useState(now.getMonth() + 1)
+  const [year, setYear] = useState(now.getFullYear())
+  const [appliedMonth, setAppliedMonth] = useState(now.getMonth() + 1)
+  const [appliedYear, setAppliedYear] = useState(now.getFullYear())
+
+  const handleMonthChange = (value: number) => {
+    setMonth(value)
+    setAppliedMonth(value)
+    loadCategoryBreakdown(value, appliedYear)
+  }
+
+  const handleYearChange = (value: number) => {
+    setYear(value)
+    setAppliedYear(value)
+    loadCategoryBreakdown(appliedMonth, value)
+  }
+
+  const loadCategoryBreakdown = async (monthToUse: number, yearToUse: number) => {
     const token = getCookie('authToken')
 
     if (!token) {
@@ -49,11 +83,12 @@ export default function DashboardPage() {
       setLoading(true)
       setError(null)
 
-      const data = await fetchExpensesPerCategory({
-        month: now.getMonth() + 1,
-        year: now.getFullYear(),
-      })
+      const [data, total] = await Promise.all([
+        fetchExpensesPerCategory({ month: monthToUse, year: yearToUse }),
+        fetchTotalDailyExpenses({ month: monthToUse, year: yearToUse }),
+      ])
 
+      setTotalExpenses(total)
       setBreakdownItems(toBreakdownItems(data.categories, data.total))
 
       // Categoria com maior valor consolidado é exibida no centro do donut.
@@ -70,33 +105,88 @@ export default function DashboardPage() {
   }
 
   useEffect(() => {
-    loadCategoryBreakdown()
+    loadCategoryBreakdown(appliedMonth, appliedYear)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (
     <AppShell title="Dashboard">
+      {/* Filters: Mês e Ano */}
+      <div className="flex flex-wrap items-end justify-between gap-3 mb-6 -mt-2">
+        <div className="flex flex-wrap items-end gap-3">
+          {/* Month Select */}
+          <div className="space-y-1">
+            <label
+              className="font-label-caps text-xs font-semibold text-on-surface block"
+              htmlFor="dashboard-month"
+            >
+              Mês
+            </label>
+            <select
+              id="dashboard-month"
+              className="bg-surface-container-lowest border border-border-subtle rounded-lg px-3 py-2 font-body-lg text-base text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+              value={month}
+              onChange={(e) => handleMonthChange(Number(e.target.value))}
+            >
+              {MONTHS.map((name, index) => (
+                <option key={index + 1} value={index + 1}>
+                  {name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Year Select */}
+          <div className="space-y-1">
+            <label
+              className="font-label-caps text-xs font-semibold text-on-surface block"
+              htmlFor="dashboard-year"
+            >
+              Ano
+            </label>
+            <select
+              id="dashboard-year"
+              className="bg-surface-container-lowest border border-border-subtle rounded-lg px-3 py-2 font-body-lg text-base text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+              value={year}
+              onChange={(e) => handleYearChange(Number(e.target.value))}
+            >
+              {Array.from({ length: 10 }, (_, i) => now.getFullYear() - 5 + i).map((y) => (
+                <option key={y} value={y}>
+                  {y}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Summary Cards Row */}
         <div className="lg:col-span-12 grid grid-cols-1 md:grid-cols-3 gap-6">
           <StatCard
-            label="Total Expenses"
-            sublabel="This Month"
+            label="Total de Despesas"
+            sublabel="Este Mês"
             icon="account_balance"
             accentColor="bg-negative-rose"
           >
             <span className="font-display-lg text-5xl font-bold text-primary">
-              R$ <span className="font-label-numeric">4.250,00</span>
+              R${' '}
+              <span className="font-label-numeric">
+                {totalExpenses.toLocaleString('pt-BR', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+              </span>
             </span>
           </StatCard>
 
-          <StatCard label="Fixed Expenses" sublabel="Upcoming 7 days" icon="event_repeat">
+          <StatCard label="Despesas Fixas" sublabel="Próximos 7 dias" icon="event_repeat">
             <span className="font-title-md text-xl font-semibold text-primary">
               R$ <span className="font-label-numeric">1.120,00</span>
             </span>
           </StatCard>
 
-          <StatCard label="Estimated Remaining" sublabel="Based on fixed" icon="savings">
+          <StatCard label="Estimativa Restante" sublabel="Com base nas fixas" icon="savings">
             <span className="font-title-md text-xl font-semibold text-positive-emerald">
               R$ <span className="font-label-numeric">850,00</span>
             </span>
@@ -123,7 +213,7 @@ export default function DashboardPage() {
               <p className="font-body-sm text-sm text-on-surface-variant mb-4">{error}</p>
               <button
                 type="button"
-                onClick={loadCategoryBreakdown}
+                onClick={() => loadCategoryBreakdown(appliedMonth, appliedYear)}
                 className="bg-primary text-on-primary font-body-lg text-base py-2 px-6 rounded-lg hover:bg-primary-container transition-colors"
               >
                 Tentar novamente

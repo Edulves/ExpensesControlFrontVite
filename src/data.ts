@@ -8,9 +8,9 @@ import type {
 
 export const navItems: NavItem[] = [
   { label: 'Dashboard', icon: 'dashboard', path: '/dashboard' },
-  { label: 'Expenses Log', icon: 'receipt_long', path: '/expenses' },
-  { label: 'Fixed Expenses', icon: 'calendar_today', path: '/fixed-expenses' },
-  { label: 'Categories', icon: 'category', path: '/categories' },
+  { label: 'Registro de Despesas', icon: 'receipt_long', path: '/expenses' },
+  { label: 'Despesas Fixas', icon: 'calendar_today', path: '/fixed-expenses' },
+  { label: 'Categorias', icon: 'category', path: '/categories' },
 ]
 
 export const categories: Category[] = [
@@ -107,7 +107,7 @@ export const fixedExpenses: FixedExpense[] = [
   {
     id: 'fixed-1',
     description: 'conta de celular',
-    tags: ['Utilities', 'Recurring'],
+    tags: ['Utilidades', 'Recorrente'],
     amount: 85.0,
     status: 'unpaid',
     dueDate: 'Oct 15',
@@ -116,8 +116,8 @@ export const fixedExpenses: FixedExpense[] = [
   },
   {
     id: 'fixed-2',
-    description: 'Rent',
-    tags: ['Housing'],
+    description: 'Aluguel',
+    tags: ['Moradia'],
     amount: 1200.0,
     status: 'paid',
     dueDate: 'Oct 01',
@@ -125,8 +125,8 @@ export const fixedExpenses: FixedExpense[] = [
   },
   {
     id: 'fixed-3',
-    description: 'Netflix Subscription',
-    tags: ['Entertainment'],
+    description: 'Assinatura Netflix',
+    tags: ['Entretenimento'],
     amount: 15.99,
     status: 'unpaid',
     dueDate: 'Oct 20',

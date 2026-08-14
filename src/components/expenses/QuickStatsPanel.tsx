@@ -27,7 +27,7 @@ export default function QuickStatsPanel({ totalToday, topCategories }: QuickStat
 
             {/* Category Breakdown Snippet */}
             <div className="bg-surface-container-lowest border border-border-subtle rounded-xl p-6 flex flex-col shadow-sm">
-                <h4 className="font-title-md text-xl font-semibold text-on-surface mb-3">Top Categories</h4>
+                <h4 className="font-title-md text-xl font-semibold text-on-surface mb-3">Principais Categorias</h4>
                 <ul className="flex flex-col gap-3">
                     {topCategories.map((category) => (
                         <li key={category.categoryId} className="flex justify-between items-center">

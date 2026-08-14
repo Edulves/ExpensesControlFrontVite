@@ -72,7 +72,7 @@ export default function CategoryDonutChart({
   return (
     <div className="bg-surface-container-lowest border border-border-subtle rounded-xl p-6 flex flex-col items-center justify-center h-full min-h-[300px]">
       <h3 className="font-title-md text-xl font-semibold text-primary w-full text-left mb-3 border-b border-border-subtle pb-2">
-        Category Breakdown
+        Participação por Categoria
       </h3>
       <div
         ref={donutRef}
@@ -83,7 +83,7 @@ export default function CategoryDonutChart({
       >
         <div className="absolute inset-2 bg-surface-container-lowest rounded-full flex flex-col items-center justify-center pointer-events-none text-center px-3">
           <span className="font-label-caps text-xs font-semibold text-outline truncate max-w-full">
-            {hovered ? hovered.label.toUpperCase() : 'Top Category'}
+            {hovered ? hovered.label.toUpperCase() : 'Categoria Principal'}
           </span>
           <span className="font-title-md text-xl font-semibold text-primary truncate max-w-full">
             {hovered ? `${hovered.percent}%` : topCategoryLabel}

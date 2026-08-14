@@ -14,9 +14,9 @@ export default function CategoriesPage() {
 
   return (
     <AppShell
-      title="Manage Categories"
-      subtitle={`Organize your spending tracking with ${categories.length} custom categories.`}
-      searchPlaceholder="Search categories..."
+      title="Gerenciar Categorias"
+      subtitle={`Organize o rastreamento dos seus gastos com ${categories.length} categorias personalizadas.`}
+      searchPlaceholder="Buscar categorias..."
     >
       {/* Page Header */}
       <div className="flex justify-end mb-6">
@@ -25,7 +25,7 @@ export default function CategoriesPage() {
           className="bg-primary text-on-primary font-body-sm text-sm py-2 px-4 rounded flex items-center justify-center gap-2 hover:opacity-90 transition-opacity shadow-sm"
         >
           <span className="material-symbols-outlined text-sm">add</span>
-          New Category
+          Nova Categoria
         </button>
       </div>
 

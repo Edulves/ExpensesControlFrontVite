@@ -5,8 +5,8 @@ import { fixedExpenses } from '../data'
 export default function FixedExpensesPage() {
   return (
     <AppShell
-      title="Fixed Expenses"
-      subtitle="Manage your recurring bills and subscriptions."
+      title="Despesas Fixas"
+      subtitle="Gerencie suas contas e assinaturas recorrentes."
     >
       {/* Bento Grid Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
@@ -14,7 +14,7 @@ export default function FixedExpensesPage() {
           <div className="flex items-center gap-2 mb-2">
             <span className="material-symbols-outlined text-on-surface-variant">payments</span>
             <span className="font-label-caps text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
-              Total Fixed Monthly
+              Total Fixo Mensal
             </span>
           </div>
           <div className="font-display-lg text-5xl font-bold text-primary mt-2">
@@ -29,7 +29,7 @@ export default function FixedExpensesPage() {
               check_circle
             </span>
             <span className="font-label-caps text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
-              Paid This Month
+              Pago Este Mês
             </span>
           </div>
           <div className="font-display-lg text-5xl font-bold text-on-background mt-2">
@@ -45,7 +45,7 @@ export default function FixedExpensesPage() {
           <div className="flex items-center gap-2 mb-2">
             <span className="material-symbols-outlined text-warning-amber">pending</span>
             <span className="font-label-caps text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
-              Upcoming (Next 7 Days)
+              Próximos (Próximos 7 Dias)
             </span>
           </div>
           <div className="font-display-lg text-5xl font-bold text-on-background mt-2">
@@ -53,7 +53,7 @@ export default function FixedExpensesPage() {
             120<span className="font-label-numeric text-xl font-semibold">,00</span>
           </div>
           <p className="font-body-sm text-sm text-on-surface-variant mt-2">
-            2 bills pending
+            2 contas pendentes
           </p>
         </div>
       </div>
@@ -64,24 +64,24 @@ export default function FixedExpensesPage() {
         <div className="p-4 border-b border-border-subtle flex justify-between items-center bg-surface-bright">
           <div className="flex gap-2">
             <button className="px-4 py-2 border border-border-subtle rounded-lg font-body-sm text-sm hover:bg-surface-container-low transition-colors flex items-center gap-2">
-              <span className="material-symbols-outlined">filter_list</span> Filter
+              <span className="material-symbols-outlined">filter_list</span> Filtrar
             </button>
             <button className="px-4 py-2 border border-border-subtle rounded-lg font-body-sm text-sm hover:bg-surface-container-low transition-colors flex items-center gap-2">
-              <span className="material-symbols-outlined">sort</span> Sort
+              <span className="material-symbols-outlined">sort</span> Ordenar
             </button>
           </div>
           <button className="md:hidden bg-primary text-on-primary font-body-sm py-2 px-4 rounded-lg flex items-center gap-2 hover:bg-primary-container">
-            <span className="material-symbols-outlined text-sm">add</span> New
+            <span className="material-symbols-outlined text-sm">add</span> Nova
           </button>
         </div>
 
         {/* List Header (Desktop) */}
         <div className="hidden md:grid grid-cols-12 gap-4 p-4 border-b border-border-subtle bg-surface-container-low text-on-surface-variant font-label-caps text-xs font-semibold uppercase tracking-wider">
-          <div className="col-span-5 pl-2">Description</div>
-          <div className="col-span-2 text-right">Amount</div>
+          <div className="col-span-5 pl-2">Descrição</div>
+          <div className="col-span-2 text-right">Valor</div>
           <div className="col-span-2 text-center">Status</div>
-          <div className="col-span-2 text-right">Due Date</div>
-          <div className="col-span-1 text-center">Action</div>
+          <div className="col-span-2 text-right">Vencimento</div>
+          <div className="col-span-1 text-center">Ação</div>
         </div>
 
         {/* Expense Rows */}

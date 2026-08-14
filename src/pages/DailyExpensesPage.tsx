@@ -10,7 +10,7 @@ import { getCookie } from "../utils/cookies";
 import type { Expense } from "../types";
 import { categories } from "../data";
 
-const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const MONTHS = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 
 export default function DailyExpensesPage() {
     const navigate = useNavigate();
@@ -157,14 +157,14 @@ export default function DailyExpensesPage() {
     };
 
     return (
-        <AppShell title="Daily Expenses" subtitle="Review and manage your day-to-day transactions.">
+        <AppShell title="Despesas Diárias" subtitle="Revise e gerencie suas transações do dia a dia.">
             {/* Filters */}
             <div className="flex flex-wrap items-end justify-between gap-3 mb-6 -mt-2">
                 <div className="flex flex-wrap items-end gap-3">
                     {/* Month Select */}
                     <div className="space-y-1">
                         <label className="font-label-caps text-xs font-semibold text-on-surface block" htmlFor="month-filter">
-                            Month
+                            Mês
                         </label>
                         <select
                             id="month-filter"
@@ -183,7 +183,7 @@ export default function DailyExpensesPage() {
                     {/* Year Select */}
                     <div className="space-y-1">
                         <label className="font-label-caps text-xs font-semibold text-on-surface block" htmlFor="year-filter">
-                            Year
+                            Ano
                         </label>
                         <select
                             id="year-filter"
@@ -202,7 +202,7 @@ export default function DailyExpensesPage() {
                     {/* Beginning of Period */}
                     <div className="space-y-1">
                         <label className="font-label-caps text-xs font-semibold text-on-surface block" htmlFor="begin-filter">
-                            From
+                            De
                         </label>
                         <input
                             id="begin-filter"
@@ -216,7 +216,7 @@ export default function DailyExpensesPage() {
                     {/* End of Period */}
                     <div className="space-y-1">
                         <label className="font-label-caps text-xs font-semibold text-on-surface block" htmlFor="end-filter">
-                            To
+                            Até
                         </label>
                         <input
                             id="end-filter"
@@ -230,7 +230,7 @@ export default function DailyExpensesPage() {
                     {/* Category Select */}
                     <div className="space-y-1">
                         <label className="font-label-caps text-xs font-semibold text-on-surface block" htmlFor="category-filter">
-                            Category
+                            Categoria
                         </label>
                         <select
                             id="category-filter"
@@ -238,7 +238,7 @@ export default function DailyExpensesPage() {
                             value={category}
                             onChange={(e) => setCategory(e.target.value)}
                         >
-                            <option value="">All categories</option>
+                            <option value="">Todas as categorias</option>
                             {categories.map((c) => (
                                 <option key={c.id} value={c.id}>
                                     {c.name.charAt(0).toUpperCase() + c.name.slice(1)}
@@ -250,12 +250,12 @@ export default function DailyExpensesPage() {
                     {/* Note Input */}
                     <div className="space-y-1">
                         <label className="font-label-caps text-xs font-semibold text-on-surface block" htmlFor="note-filter">
-                            Note
+                            Observação
                         </label>
                         <input
                             id="note-filter"
                             type="text"
-                            placeholder="Search note..."
+                            placeholder="Buscar observação..."
                             value={note}
                             onChange={(e) => setNote(e.target.value)}
                             className="bg-surface-container-lowest border border-border-subtle rounded-lg px-3 py-2 font-body-lg text-base text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
@@ -267,7 +267,7 @@ export default function DailyExpensesPage() {
                         onClick={handleApplyFilters}
                         className="bg-primary text-on-primary rounded-lg py-2 px-4 items-center justify-center gap-2 hover:bg-primary-container transition-colors shadow-sm font-label-caps text-xs font-semibold"
                     >
-                        Apply
+                        Aplicar
                     </button>
                 </div>
 
@@ -313,7 +313,7 @@ export default function DailyExpensesPage() {
                 <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
                     <div className="flex items-center gap-2">
                         <label className="font-label-caps text-xs font-semibold text-on-surface-variant" htmlFor="qty-filter">
-                            Rows per page
+                            Linhas por página
                         </label>
                         <select
                             id="qty-filter"
@@ -338,10 +338,10 @@ export default function DailyExpensesPage() {
                             onClick={() => setPage((p) => Math.max(1, p - 1))}
                             className="px-3 py-1.5 rounded-lg border border-border-subtle font-label-caps text-xs font-semibold text-primary hover:bg-surface-container-low transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                         >
-                            Prev
+                            Anterior
                         </button>
                         <span className="font-label-caps text-xs font-semibold text-on-surface-variant">
-                            Page {page} of {Math.max(1, totalPages)} · {totalItems} item(s)
+                            Página {page} de {Math.max(1, totalPages)} · {totalItems} item(ns)
                         </span>
                         <button
                             type="button"
@@ -349,7 +349,7 @@ export default function DailyExpensesPage() {
                             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                             className="px-3 py-1.5 rounded-lg border border-border-subtle font-label-caps text-xs font-semibold text-primary hover:bg-surface-container-low transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                         >
-                            Next
+                            Próxima
                         </button>
                     </div>
                 </div>

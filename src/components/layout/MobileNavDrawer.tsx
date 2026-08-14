@@ -23,10 +23,10 @@ export default function MobileNavDrawer({ open, onClose }: MobileNavDrawerProps)
             </div>
             <div>
               <h1 className="font-title-md text-xl font-semibold text-primary tracking-tight">
-                Expenses Control
+                Controle de Despesas
               </h1>
               <p className="font-body-sm text-sm text-on-surface-variant opacity-70">
-                Financial Calm
+                Calma Financeira
               </p>
             </div>
           </div>
@@ -71,14 +71,14 @@ export default function MobileNavDrawer({ open, onClose }: MobileNavDrawerProps)
             className="flex items-center gap-3 px-2 py-1 rounded-lg text-on-surface-variant opacity-70 hover:bg-surface-container-low transition-all font-label-caps text-xs font-semibold"
           >
             <span className="material-symbols-outlined">help</span>
-            <span>Help</span>
+            <span>Ajuda</span>
           </a>
           <a
             href="#"
             className="flex items-center gap-3 px-2 py-1 rounded-lg text-on-surface-variant opacity-70 hover:bg-surface-container-low transition-all font-label-caps text-xs font-semibold"
           >
             <span className="material-symbols-outlined">logout</span>
-            <span>Logout</span>
+            <span>Sair</span>
           </a>
         </div>
       </aside>

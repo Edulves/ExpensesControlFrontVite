@@ -201,6 +201,61 @@ export async function fetchExpensesPerCategory(filters: {
     };
 }
 
+export async function fetchTotalDailyExpenses(filters: {
+    month: number;
+    year: number;
+    beginningOfPeriod?: string;
+    endOfPeriod?: string;
+}): Promise<number> {
+    const token = getCookie("authToken");
+
+    if (!token) {
+        throw new Error("Token de autenticação não encontrado. Faça login novamente.");
+    }
+
+    // Mesma regra dos demais endpoints: período completo desconsidera Mês/Ano.
+    const hasPeriod = Boolean(filters.beginningOfPeriod) && Boolean(filters.endOfPeriod);
+
+    const params = new URLSearchParams();
+
+    if (hasPeriod) {
+        params.set("BeginningOfPeriod", filters.beginningOfPeriod!);
+        params.set("EndOfPeriod", filters.endOfPeriod!);
+    } else {
+        params.set("Month", String(filters.month || 0));
+        params.set("Year", String(filters.year || 0));
+        params.set("BeginningOfPeriod", "");
+        params.set("EndOfPeriod", "");
+    }
+
+    const url = `${API_BASE_URL}/DataConsolidation/TotalDailyExpenses?${params.toString()}`;
+
+    const response = await fetch(url, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error(`Falha ao buscar total de despesas (status ${response.status})`);
+    }
+
+    const data = await response.json();
+
+    // Normaliza o retorno, que pode vir como número direto ou embrulhado em
+    // objeto com campos comuns (total / totalValue / value / amount).
+    if (typeof data === "number") return data;
+
+    if (data && typeof data === "object") {
+        const candidate =
+            data.totalExpenses ?? data.total ?? data.totalValue ?? data.value ?? data.amount;
+        const num = Number(candidate);
+        if (!Number.isNaN(num)) return num;
+    }
+
+    return 0;
+}
+
 export interface TransactionCategory {
     transactionCategoryId: number;
     name: string;

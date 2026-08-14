@@ -27,10 +27,10 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
         </div>
         <div>
           <h1 className="font-title-md text-xl font-semibold text-primary tracking-tight">
-            Expenses Control
+            Controle de Despesas
           </h1>
           <p className="font-body-sm text-sm text-on-surface-variant opacity-70">
-            Financial Calm
+            Calma Financeira
           </p>
         </div>
       </div>
@@ -40,7 +40,7 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
         <span className="material-symbols-outlined" data-weight="fill">
           add
         </span>
-        Add Expense
+        Adicionar Despesa
       </button>
 
       {/* Navigation */}
@@ -78,7 +78,7 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
           className={`${linkBaseClasses} text-on-surface-variant opacity-70 hover:bg-surface-container-low`}
         >
           <span className="material-symbols-outlined">help</span>
-          <span>Help</span>
+          <span>Ajuda</span>
         </a>
         <a
           href="#"
@@ -89,7 +89,7 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
           className={`${linkBaseClasses} text-on-surface-variant opacity-70 hover:bg-surface-container-low`}
         >
           <span className="material-symbols-outlined">logout</span>
-          <span>Logout</span>
+          <span>Sair</span>
         </a>
       </div>
     </aside>

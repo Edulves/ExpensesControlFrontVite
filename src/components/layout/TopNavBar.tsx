@@ -55,7 +55,7 @@ export default function TopNavBar({
           </button>
           <div className="ml-1 w-8 h-8 rounded-full bg-surface-variant border border-border-subtle overflow-hidden flex-shrink-0">
             <img
-              alt="User profile photo"
+              alt="Foto de perfil do usuário"
               className="w-full h-full object-cover"
               src="https://lh3.googleusercontent.com/aida-public/AB6AXuCRXua6uEgMX-hORyLlItGzV6JlfSm0yDcpe2sSCmwuVyBo8cGB7vwMYZEbDCyOTt3unqkt2U49Wm8450tFw_MDbML9DElsqZhkXg28pHlgyfqtGqKCEW5_jRuJUAPcoidCpttKcdVNEJC-MJvoHB3tFJQQUuSjIoxHrtyPsz7ElgJTcNvas83aoB1GbK2f2jVqTUvNuNM6BgBjA4TyvlvMi2d0_sSzhMau3HQwLb6gme0vgDx505Z4PA"
             />

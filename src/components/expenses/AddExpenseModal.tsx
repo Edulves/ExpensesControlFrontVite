@@ -112,7 +112,7 @@ export default function AddExpenseModal({ open, onClose, onSaved }: AddExpenseMo
       {/* Modal Content */}
       <div className="bg-surface-container-lowest border border-border-subtle rounded-xl w-full max-w-md mx-4 max-h-[85vh] flex flex-col shadow-xl relative z-10">
         <div className="flex justify-between items-center px-6 py-4 border-b border-border-subtle flex-shrink-0">
-          <h3 className="font-title-md text-xl font-semibold text-on-surface">New Expense Entries</h3>
+          <h3 className="font-title-md text-xl font-semibold text-on-surface">Novas Entradas de Despesa</h3>
           <button
             onClick={onClose}
             className="text-on-surface-variant hover:text-on-surface transition-colors"
@@ -129,7 +129,7 @@ export default function AddExpenseModal({ open, onClose, onSaved }: AddExpenseMo
             >
               <div className="flex items-center justify-between">
                 <span className="font-label-caps text-[10px] font-semibold text-on-surface-variant uppercase">
-                  Entry {index + 1}
+                  Entrada {index + 1}
                 </span>
                 {rows.length > 1 && (
                   <button
@@ -145,7 +145,7 @@ export default function AddExpenseModal({ open, onClose, onSaved }: AddExpenseMo
               <div className="grid grid-cols-2 gap-2">
                 <div className="flex flex-col gap-1">
                   <label className="font-label-caps text-[10px] font-semibold text-on-surface-variant">
-                    Date
+                    Data
                   </label>
                   <input
                     type="date"
@@ -156,7 +156,7 @@ export default function AddExpenseModal({ open, onClose, onSaved }: AddExpenseMo
                 </div>
                 <div className="flex flex-col gap-1">
                   <label className="font-label-caps text-[10px] font-semibold text-on-surface-variant">
-                    Amount
+                    Valor
                   </label>
                   <input
                     type="number"
@@ -172,7 +172,7 @@ export default function AddExpenseModal({ open, onClose, onSaved }: AddExpenseMo
 
               <div className="flex flex-col gap-1">
                 <label className="font-label-caps text-[10px] font-semibold text-on-surface-variant">
-                  Category
+                  Categoria
                 </label>
                 <select
                   value={row.categoryId}
@@ -190,11 +190,11 @@ export default function AddExpenseModal({ open, onClose, onSaved }: AddExpenseMo
 
               <div className="flex flex-col gap-1">
                 <label className="font-label-caps text-[10px] font-semibold text-on-surface-variant">
-                  Note (Optional)
+                  Observação (Opcional)
                 </label>
                 <input
                   type="text"
-                  placeholder="Brief description..."
+                  placeholder="Descrição breve..."
                   value={row.note}
                   onChange={(e) => setRow(index, { note: e.target.value })}
                   className="w-full px-2 py-1.5 bg-surface-container-lowest border border-border-subtle rounded-lg font-body-sm text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
@@ -209,7 +209,7 @@ export default function AddExpenseModal({ open, onClose, onSaved }: AddExpenseMo
             className="flex items-center justify-center gap-2 border border-dashed border-border-subtle rounded-lg py-2 font-label-caps text-xs font-semibold text-primary hover:bg-surface-container-low transition-colors"
           >
             <span className="material-symbols-outlined text-[16px]">add</span>
-            Add entry
+            Adicionar entrada
           </button>
 
           {submitError && (
@@ -222,14 +222,14 @@ export default function AddExpenseModal({ open, onClose, onSaved }: AddExpenseMo
               onClick={onClose}
               className="px-4 py-2 font-label-caps text-xs font-semibold text-primary hover:bg-surface-container-low rounded-lg transition-colors"
             >
-              Cancel
+              Cancelar
             </button>
             <button
               type="submit"
               disabled={saving || categs.length === 0}
               className="px-4 py-2 font-label-caps text-xs font-semibold bg-primary text-on-primary rounded-lg shadow-sm hover:bg-primary-container transition-colors active:scale-95 duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              {saving ? 'Saving...' : 'Save Entries'}
+              {saving ? 'Salvando...' : 'Salvar Entradas'}
             </button>
           </div>
         </form>

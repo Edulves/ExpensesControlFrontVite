@@ -62,8 +62,8 @@ export default function LoginPage() {
             <main className="w-full max-w-md bg-surface-container-lowest border border-border-subtle rounded-xl p-6 shadow-sm">
                 {/* Header */}
                 <div className="text-center mb-6">
-                    <h1 className="font-display-lg text-5xl font-bold text-primary mb-1 tracking-tight">Expenses Control</h1>
-                    <p className="font-body-lg text-base text-on-surface-variant">Financial Calm</p>
+                    <h1 className="font-display-lg text-5xl font-bold text-primary mb-1 tracking-tight">Controle de Despesas</h1>
+                    <p className="font-body-lg text-base text-on-surface-variant">Calma Financeira</p>
                 </div>
 
                 {/* Form */}
@@ -71,7 +71,7 @@ export default function LoginPage() {
                     {/* Email Input */}
                     <div className="space-y-1">
                         <label className="font-label-caps text-xs font-semibold text-on-surface block" htmlFor="email">
-                            Email Address
+                            E-mail
                         </label>
                         <div className="relative">
                             <span
@@ -96,10 +96,10 @@ export default function LoginPage() {
                     <div className="space-y-1">
                         <div className="flex justify-between items-center">
                             <label className="font-label-caps text-xs font-semibold text-on-surface block" htmlFor="password">
-                                Password
+                                Senha
                             </label>
                             <a className="font-body-sm text-sm text-primary hover:underline transition-all" href="#">
-                                Forgot Password?
+                                Esqueceu a senha?
                             </a>
                         </div>
                         <div className="relative">
@@ -130,11 +130,11 @@ export default function LoginPage() {
                         {loading ? (
                             <>
                                 <span className="inline-block w-4 h-4 border-2 border-on-primary border-t-transparent rounded-full animate-spin" />
-                                Signing in...
+                                Entrando...
                             </>
                         ) : (
                             <>
-                                Sign In
+                                Entrar
                                 <span aria-hidden="true" className="material-symbols-outlined text-sm">
                                     arrow_forward
                                 </span>
@@ -149,7 +149,7 @@ export default function LoginPage() {
                         <div className="w-full border-t border-border-subtle" />
                     </div>
                     <span className="relative bg-surface-container-lowest px-4 font-body-sm text-sm text-on-surface-variant">
-                        or continue with
+                        ou continue com
                     </span>
                 </div>
 
@@ -181,9 +181,9 @@ export default function LoginPage() {
 
                 {/* Sign Up Link */}
                 <p className="text-center font-body-sm text-sm text-on-surface-variant">
-                    Don't have an account?{" "}
+                    Não tem uma conta?{" "}
                     <a className="text-primary font-semibold hover:underline transition-all" href="#">
-                        Create Account
+                        Criar Conta
                     </a>
                 </p>
             </main>

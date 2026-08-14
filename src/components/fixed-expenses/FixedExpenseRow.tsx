@@ -37,28 +37,28 @@ export default function FixedExpenseRow({ expense }: FixedExpenseRowProps) {
           expense.status === 'paid' ? 'text-on-surface-variant' : 'text-on-background'
         }`}
       >
-        <span className="md:hidden text-on-surface-variant">Amount:</span>
+        <span className="md:hidden text-on-surface-variant">Valor:</span>
         <span>{expense.amount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
       </div>
 
       <div className="col-span-1 md:col-span-2 flex justify-start md:justify-center">
         {expense.status === 'paid' ? (
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container text-positive-emerald border border-positive-emerald/20 font-label-caps text-xs font-semibold">
-            <span className="material-symbols-outlined text-[14px]">check</span> Paid
+            <span className="material-symbols-outlined text-[14px]">check</span> Pago
           </span>
         ) : expense.urgent ? (
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-high text-warning-amber border border-warning-amber/20 font-label-caps text-xs font-semibold">
-            <span className="w-1.5 h-1.5 rounded-full bg-warning-amber" /> Unpaid
+            <span className="w-1.5 h-1.5 rounded-full bg-warning-amber" /> Não pago
           </span>
         ) : (
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-high text-on-surface-variant border border-border-subtle font-label-caps text-xs font-semibold">
-            Unpaid
+            Não pago
           </span>
         )}
       </div>
 
       <div className="col-span-1 md:col-span-2 flex justify-between md:justify-end md:text-right font-body-sm text-sm text-on-surface-variant">
-        <span className="md:hidden">Due:</span>
+        <span className="md:hidden">Vence:</span>
         <span className={expense.urgent ? 'font-bold text-on-background' : undefined}>
           {expense.dueDate}
         </span>

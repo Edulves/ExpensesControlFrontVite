@@ -19,11 +19,11 @@ export default function ExpensesTable({ expenses, onEdit, onDelete }: ExpensesTa
                 <table className="w-full text-left border-collapse">
                     <thead>
                         <tr className="border-b border-border-subtle bg-surface-container-low">
-                            <th className="py-3 px-6 font-label-caps text-xs text-on-surface-variant font-semibold">Date</th>
-                            <th className="py-3 px-6 font-label-caps text-xs text-on-surface-variant font-semibold">Description</th>
-                            <th className="py-3 px-6 font-label-caps text-xs text-on-surface-variant font-semibold">Category</th>
-                            <th className="py-3 px-6 font-label-caps text-xs text-on-surface-variant font-semibold text-right">Amount</th>
-                            <th className="py-3 px-6 font-label-caps text-xs text-on-surface-variant font-semibold text-right">Actions</th>
+                            <th className="py-3 px-6 font-label-caps text-xs text-on-surface-variant font-semibold">Data</th>
+                            <th className="py-3 px-6 font-label-caps text-xs text-on-surface-variant font-semibold">Descrição</th>
+                            <th className="py-3 px-6 font-label-caps text-xs text-on-surface-variant font-semibold">Categoria</th>
+                            <th className="py-3 px-6 font-label-caps text-xs text-on-surface-variant font-semibold text-right">Valor</th>
+                            <th className="py-3 px-6 font-label-caps text-xs text-on-surface-variant font-semibold text-right">Ações</th>
                         </tr>
                     </thead>
                     <tbody className="font-body-sm text-sm">
@@ -56,7 +56,7 @@ export default function ExpensesTable({ expenses, onEdit, onDelete }: ExpensesTa
                                     <div className="inline-flex items-center justify-end gap-1">
                                         <button
                                             type="button"
-                                            title="Edit"
+                                            title="Editar"
                                             onClick={() => onEdit?.(expense)}
                                             className="text-on-surface-variant hover:text-primary transition-colors p-1 rounded"
                                         >
@@ -64,7 +64,7 @@ export default function ExpensesTable({ expenses, onEdit, onDelete }: ExpensesTa
                                         </button>
                                         <button
                                             type="button"
-                                            title="Delete"
+                                            title="Excluir"
                                             onClick={() => onDelete?.(expense)}
                                             className="text-on-surface-variant hover:text-negative-rose transition-colors p-1 rounded"
                                         >
@@ -78,7 +78,7 @@ export default function ExpensesTable({ expenses, onEdit, onDelete }: ExpensesTa
                 </table>
             </div>
             <div className="p-3 border-t border-border-subtle bg-surface-bright flex justify-center">
-                <button className="text-primary font-label-caps text-xs font-semibold hover:underline">View All Logs</button>
+                <button className="text-primary font-label-caps text-xs font-semibold hover:underline">Ver Todos os Registros</button>
             </div>
         </div>
     );
