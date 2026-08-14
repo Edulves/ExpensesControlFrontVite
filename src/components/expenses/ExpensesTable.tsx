@@ -77,9 +77,6 @@ export default function ExpensesTable({ expenses, onEdit, onDelete }: ExpensesTa
                     </tbody>
                 </table>
             </div>
-            <div className="p-3 border-t border-border-subtle bg-surface-bright flex justify-center">
-                <button className="text-primary font-label-caps text-xs font-semibold hover:underline">Ver Todos os Registros</button>
-            </div>
         </div>
     );
 }

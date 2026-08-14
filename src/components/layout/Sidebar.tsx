@@ -35,14 +35,6 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
         </div>
       </div>
 
-      {/* CTA */}
-      <button className="w-full bg-primary text-on-primary font-body-sm text-sm py-1 px-2 rounded flex items-center justify-center gap-2 hover:opacity-90 transition-opacity active:scale-95 shadow-sm mb-6">
-        <span className="material-symbols-outlined" data-weight="fill">
-          add
-        </span>
-        Adicionar Despesa
-      </button>
-
       {/* Navigation */}
       <nav className="flex-1 space-y-1">
         {navItems.map((item) => (
@@ -73,13 +65,6 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
 
       {/* Footer */}
       <div className="mt-auto space-y-1 pt-3 border-t border-border-subtle">
-        <a
-          href="#"
-          className={`${linkBaseClasses} text-on-surface-variant opacity-70 hover:bg-surface-container-low`}
-        >
-          <span className="material-symbols-outlined">help</span>
-          <span>Ajuda</span>
-        </a>
         <a
           href="#"
           onClick={(e) => {

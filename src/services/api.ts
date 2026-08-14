@@ -256,6 +256,87 @@ export async function fetchTotalDailyExpenses(filters: {
     return 0;
 }
 
+export interface FixedExpenseApiItem {
+    fixedExpenseId: number;
+    description: string;
+    amount: number;
+    isPaid: boolean;
+    fixedExpenseDate: string;
+    userId: string;
+    isDeleted?: boolean;
+    createdAt?: string;
+}
+
+export interface FixedExpenseFilters {
+    month: number;
+    year: number;
+    beginningOfPeriod?: string;
+    endOfPeriod?: string;
+    expenseDescription?: string;
+    page?: number;
+    qty?: number;
+}
+
+export async function fetchFixedExpenses(filters: FixedExpenseFilters): Promise<import("../types").FixedExpense[]> {
+    const token = getCookie("authToken");
+
+    if (!token) {
+        throw new Error("Token de autenticação não encontrado. Faça login novamente.");
+    }
+
+    const hasPeriod = Boolean(filters.beginningOfPeriod) && Boolean(filters.endOfPeriod);
+
+    const params = new URLSearchParams();
+
+    if (hasPeriod) {
+        params.set("BeginningOfPeriod", filters.beginningOfPeriod!);
+        params.set("EndOfPeriod", filters.endOfPeriod!);
+    } else {
+        params.set("Month", String(filters.month || 0));
+        params.set("Year", String(filters.year || 0));
+        params.set("BeginningOfPeriod", "");
+        params.set("EndOfPeriod", "");
+    }
+
+    params.set("ExpenseDescription", filters.expenseDescription ?? "");
+    params.set("Page", String(filters.page ?? 1));
+    params.set("QTY", String(filters.qty ?? 100));
+
+    const url = `${API_BASE_URL}/FixedExpenses?${params.toString()}`;
+
+    const response = await fetch(url, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error(`Falha ao buscar despesas fixas (status ${response.status})`);
+    }
+
+    const data = await response.json();
+
+    // Tolerante a array direto ou retorno paginado (items/data/fixedExpenses).
+    const rawItems: FixedExpenseApiItem[] = Array.isArray(data)
+        ? data
+        : data.items || data.data || data.fixedExpenses || [];
+
+    return rawItems
+        .filter((item) => !item.isDeleted)
+        .map((item) => ({
+            id: String(item.fixedExpenseId),
+            description: item.description,
+            tags: [] as string[],
+            amount: item.amount,
+            status: item.isPaid ? ("paid" as const) : ("unpaid" as const),
+            dueDate: item.fixedExpenseDate
+                ? item.fixedExpenseDate.slice(0, 10).split("-").reverse().join("/")
+                : "",
+            icon: "receipt_long",
+            urgent: !item.isPaid,
+        }));
+}
+
 export interface TransactionCategory {
     transactionCategoryId: number;
     name: string;
@@ -382,4 +463,164 @@ export async function deleteDailyExpense(id: number): Promise<void> {
         }
         throw new Error(detail);
     }
+}
+
+// --- Fixed Expenses (PUT: toggle de pagamento) ---------------------------------
+
+export interface CreateFixedExpenseEntry {
+    description: string;
+    amount: number;
+    fixedExpenseDate: string;
+}
+
+export interface UpdateFixedExpenseEntry {
+    fixedExpensesId: number;
+    description: string;
+    amount: number;
+    isPaid: boolean;
+    fixedExpenseDate: string;
+}
+
+// Atualiza o estado de pagamento (isPaid) de uma despesa fixa via PUT.
+// O endpoint aceita um array com um único objeto e preserva os demais campos
+// quando eles vêm "neutros": descrição vazia (string.IsNullOrEmpty -> mantém),
+// amount <= 0 (mantém) e fixedExpenseDate == DateOnly.MinValue -> mantém.
+export async function updateFixedExpensePaidStatus(entry: UpdateFixedExpenseEntry): Promise<void> {
+    const token = getCookie("authToken");
+
+    if (!token) {
+        throw new Error("Token de autenticação não encontrado. Faça login novamente.");
+    }
+
+    const response = await fetch(`${API_BASE_URL}/FixedExpenses`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify([entry]),
+    });
+
+    if (!response.ok) {
+        let detail = `Falha ao atualizar despesa fixa (status ${response.status})`;
+        try {
+            const errorData = await response.json();
+            detail = errorData?.detail || errorData?.title || detail;
+        } catch {
+            // corpo não-JSON; mantém a mensagem padrão
+        }
+        throw new Error(detail);
+    }
+}
+
+// PUT genérico para /FixedExpenses — usado pelo modal de edição (permite
+// alterar descrição, valor, status e data simultaneamente).
+export async function updateFixedExpenses(entries: UpdateFixedExpenseEntry[]): Promise<void> {
+    const token = getCookie("authToken");
+
+    if (!token) {
+        throw new Error("Token de autenticação não encontrado. Faça login novamente.");
+    }
+
+    const response = await fetch(`${API_BASE_URL}/FixedExpenses`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(entries),
+    });
+
+    if (!response.ok) {
+        let detail = `Falha ao atualizar despesa fixa (status ${response.status})`;
+        try {
+            const errorData = await response.json();
+            detail = errorData?.detail || errorData?.title || detail;
+        } catch {
+            // corpo não-JSON; mantém a mensagem padrão
+        }
+        throw new Error(detail);
+    }
+}
+
+// POST /FixedExpenses — cria uma ou mais despesas fixas.
+export async function createFixedExpenses(entries: CreateFixedExpenseEntry[]): Promise<void> {
+    const token = getCookie("authToken");
+
+    if (!token) {
+        throw new Error("Token de autenticação não encontrado. Faça login novamente.");
+    }
+
+    const response = await fetch(`${API_BASE_URL}/FixedExpenses`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(entries),
+    });
+
+    if (!response.ok) {
+        let detail = `Falha ao criar despesas fixas (status ${response.status})`;
+        try {
+            const errorData = await response.json();
+            detail = errorData?.detail || errorData?.title || detail;
+        } catch {
+            // corpo não-JSON; mantém a mensagem padrão
+        }
+        throw new Error(detail);
+    }
+}
+
+// DELETE /FixedExpenses/{id} — exclui uma despesa fixa.
+export async function deleteFixedExpense(id: number): Promise<void> {
+    const token = getCookie("authToken");
+
+    if (!token) {
+        throw new Error("Token de autenticação não encontrado. Faça login novamente.");
+    }
+
+    const response = await fetch(`${API_BASE_URL}/FixedExpenses/${id}`, {
+        method: "DELETE",
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    if (!response.ok) {
+        let detail = `Falha ao excluir despesa fixa (status ${response.status})`;
+        try {
+            const errorData = await response.json();
+            detail = errorData?.detail || errorData?.title || detail;
+        } catch {
+            // corpo não-JSON; mantém a mensagem padrão
+        }
+        throw new Error(detail);
+    }
+}
+
+// --- Consolidação de despesas fixas ------------------------------------------
+
+// GET /DataConsolidation/FixedExpenses?Month=...&Year=...
+// Retorna { paidValue, notPaidValue } para o mês/ano informado.
+export async function fetchFixedExpensesConsolidation(month: number, year: number): Promise<{ paidValue: number; notPaidValue: number }> {
+    const token = getCookie("authToken");
+
+    if (!token) {
+        throw new Error("Token de autenticação não encontrado. Faça login novamente.");
+    }
+
+    const url = `${API_BASE_URL}/DataConsolidation/FixedExpenses?Month=${month}&Year=${year}`;
+
+    const response = await fetch(url, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error(`Falha ao buscar consolidação de despesas fixas (status ${response.status})`);
+    }
+
+    return response.json();
 }

@@ -70,13 +70,6 @@ export default function MobileNavDrawer({ open, onClose }: MobileNavDrawerProps)
             href="#"
             className="flex items-center gap-3 px-2 py-1 rounded-lg text-on-surface-variant opacity-70 hover:bg-surface-container-low transition-all font-label-caps text-xs font-semibold"
           >
-            <span className="material-symbols-outlined">help</span>
-            <span>Ajuda</span>
-          </a>
-          <a
-            href="#"
-            className="flex items-center gap-3 px-2 py-1 rounded-lg text-on-surface-variant opacity-70 hover:bg-surface-container-low transition-all font-label-caps text-xs font-semibold"
-          >
             <span className="material-symbols-outlined">logout</span>
             <span>Sair</span>
           </a>
