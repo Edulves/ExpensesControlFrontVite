@@ -5,10 +5,16 @@ import ExpensesTable from "../components/expenses/ExpensesTable";
 import QuickStatsPanel from "../components/expenses/QuickStatsPanel";
 import AddExpenseModal from "../components/expenses/AddExpenseModal";
 import EditExpenseModal from "../components/expenses/EditExpenseModal";
-import { fetchDailyExpenses, fetchExpensesPerCategory, deleteDailyExpense, type ExpenseByCategory } from "../services/api";
+import {
+    fetchDailyExpenses,
+    fetchExpensesPerCategory,
+    deleteDailyExpense,
+    fetchTransactionCategories,
+    type ExpenseByCategory,
+    type TransactionCategory,
+} from "../services/api";
 import { getCookie } from "../utils/cookies";
 import type { Expense } from "../types";
-import { categories } from "../data";
 
 const MONTHS = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 
@@ -29,6 +35,8 @@ export default function DailyExpensesPage() {
     const [endOfPeriod, setEndOfPeriod] = useState("");
     const [category, setCategory] = useState("");
     const [note, setNote] = useState("");
+    const [categoryOptions, setCategoryOptions] = useState<TransactionCategory[]>([]);
+    const [categoryOptionsError, setCategoryOptionsError] = useState<string | null>(null);
 
     // Filtros "aplicados" — só são atualizados ao clicar em Apply
     const [appliedMonth, setAppliedMonth] = useState(now.getMonth() + 1);
@@ -130,6 +138,35 @@ export default function DailyExpensesPage() {
             cancelled = true;
         };
     }, [appliedMonth, appliedYear, appliedBeginningOfPeriod, appliedEndOfPeriod, appliedCategory, appliedNote, page, qty]);
+
+    // Carrega as categorias de transação a partir da API (uma única vez).
+    // Usadas para popular o filtro "Categoria". Se falhar, o select fica só
+    // com "Todas as categorias" e mostra uma mensagem discreta.
+    useEffect(() => {
+        let cancelled = false;
+        const token = getCookie("authToken");
+        if (!token) return;
+
+        (async () => {
+            try {
+                const items = await fetchTransactionCategories();
+                if (!cancelled) {
+                    setCategoryOptions(items);
+                    setCategoryOptionsError(null);
+                }
+            } catch (err) {
+                if (!cancelled) {
+                    setCategoryOptionsError(
+                        err instanceof Error ? err.message : "Erro ao carregar categorias.",
+                    );
+                }
+            }
+        })();
+
+        return () => {
+            cancelled = true;
+        };
+    }, []);
 
     const handleApplyFilters = () => {
         setAppliedMonth(month);
@@ -239,12 +276,17 @@ export default function DailyExpensesPage() {
                             onChange={(e) => setCategory(e.target.value)}
                         >
                             <option value="">Todas as categorias</option>
-                            {categories.map((c) => (
-                                <option key={c.id} value={c.id}>
+                            {categoryOptions.map((c) => (
+                                <option key={c.transactionCategoryId} value={c.name}>
                                     {c.name.charAt(0).toUpperCase() + c.name.slice(1)}
                                 </option>
                             ))}
                         </select>
+                        {categoryOptionsError && (
+                            <p className="font-label-caps text-xs text-negative-rose mt-1">
+                                {categoryOptionsError}
+                            </p>
+                        )}
                     </div>
 
                     {/* Note Input */}

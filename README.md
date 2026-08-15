@@ -54,45 +54,41 @@ As categorias são utilizadas nos lançamentos e também no agrupamento das info
 
 ```text
 src/
-├── components/
-│   ├── layout/
-│   │   ├── AppShell.tsx
-│   │   ├── Sidebar.tsx
-│   │   ├── MobileNavDrawer.tsx
-│   │   └── TopNavBar.tsx
-│   │
-│   ├── ui/
-│   │   └── StatCard.tsx
-│   │
-│   ├── dashboard/
-│   │   ├── RecentExpensesList.tsx
-│   │   └── CategoryDonutChart.tsx
-│   │
-│   ├── expenses/
-│   │   ├── ExpensesTable.tsx
-│   │   ├── QuickStatsPanel.tsx
-│   │   └── AddExpenseModal.tsx
-│   │
-│   ├── fixed-expenses/
-│   │   └── FixedExpenseRow.tsx
-│   │
-│   └── categories/
-│       └── CategoryCard.tsx
-│
-├── pages/
-│   ├── LoginPage.tsx
-│   ├── DashboardPage.tsx
-│   ├── DailyExpensesPage.tsx
-│   ├── FixedExpensesPage.tsx
-│   └── CategoriesPage.tsx
-│
-├── data.ts
-├── types.ts
-├── App.tsx
-├── index.css
-└── main.tsx
-
-tailwind.config.ts
+  components/
+    layout/
+      AppShell.tsx        # compõe Sidebar + TopNavBar + drawer mobile p/ páginas autenticadas
+      Sidebar.tsx          # menu lateral fixo (desktop), com NavLink ativo por rota
+      MobileNavDrawer.tsx  # menu lateral em drawer (mobile), aberto pelo botão "menu" do TopNavBar
+      TopNavBar.tsx        # barra superior reutilizável (título, subtítulo, busca opcional, avatar)
+    ui/
+      StatCard.tsx          # card genérico de estatística (usado no Dashboard)
+    dashboard/
+      RecentExpensesList.tsx
+      CategoryDonutChart.tsx
+      CategoryHorizontalBarChart.tsx
+    expenses/
+      ExpensesTable.tsx
+      QuickStatsPanel.tsx
+      AddExpenseModal.tsx   # modal controlado por estado React (useState), não mais manipulação de DOM
+    fixed-expenses/
+      FixedExpenseRow.tsx
+    categories/
+      CategoryCard.tsx
+  pages/
+    LoginPage.tsx
+    DashboardPage.tsx
+    DailyExpensesPage.tsx
+    FixedExpensesPage.tsx
+    CategoriesPage.tsx
+  config/
+    navigation.ts          # itens do menu lateral (metadados de UI, não vêm da API)
+  services/
+    api.ts                 # cliente HTTP com todos os endpoints consumidos pelo app
+  types.ts                 # tipos TypeScript compartilhados
+  App.tsx                  # BrowserRouter + Routes
+  index.css                # diretivas do Tailwind + estilos globais (Material Symbols)
+  main.tsx                 # entrypoint do React
+tailwind.config.ts          # todos os tokens de cor/spacing/type dos 5 designs originais (idênticos entre eles)
 ```
 
 ### Organização
@@ -114,6 +110,7 @@ Contém componentes reutilizáveis separados de acordo com sua finalidade:
 
 **`data.ts`**
 
+<<<<<<< Updated upstream
 Atualmente contém os dados utilizados pela aplicação durante o desenvolvimento.
 
 Esses dados são mockados e podem posteriormente ser substituídos por informações provenientes da API.
@@ -191,3 +188,10 @@ Em telas maiores, a navegação utiliza uma barra lateral fixa.
 Em dispositivos menores, a navegação lateral pode ser aberta através do menu mobile.
 
 ---
+- **`AppShell`** unifica o layout autenticado (Sidebar + TopNavBar + área de conteúdo com `max-w-container-max`) para Dashboard, Daily Expenses, Fixed Expenses e Categories. O Login não usa `AppShell`, pois é uma tela isolada, sem sidebar.
+- **`TopNavBar`** agora sempre mostra o título da página (antes, cada tela decidia isso de um jeito diferente); a busca só aparece quando a página faz sentido para ela (`searchPlaceholder`), como em Categories.
+- **`Sidebar`** ficou fixa em todas as telas autenticadas, com o botão "Add Expense" sempre no topo (era inconsistente entre os protótipos) e o item ativo calculado pela rota atual via `NavLink`, não mais por classes fixas em cada HTML.
+- Ícones preenchidos (`Material Symbols`) usam sempre o atributo `data-weight="fill"`, já estilizado globalmente em `index.css` — substitui as variações `.filled-icon` / `.icon-filled` dos protótipos.
+- O modal "New Expense Entry" e o FAB mobile de Daily Expenses, que no HTML original usavam `onclick` + `classList.toggle` no DOM puro, agora são controlados por `useState` (`AddExpenseModal` + `DailyExpensesPage`).
+- O login usa a API real (`POST /api/Auth/login`), armazenando `authToken` e `tokenExpiration` em cookies e redirecionando para `/dashboard` em caso de sucesso.
+- Todos os dados exibidos (despesas, contas fixas, breakdown de categorias, categorias de transação) vêm da API através de `src/services/api.ts`. Não há mais dados mockados de negócio no projeto; apenas `src/config/navigation.ts` mantém a configuração estática do menu lateral, que é acoplada às rotas do React Router.

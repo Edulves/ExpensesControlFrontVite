@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { navItems } from '../../data'
+import { navItems } from '../../config/navigation'
 import { deleteCookie } from '../../utils/cookies'
 
 interface SidebarProps {

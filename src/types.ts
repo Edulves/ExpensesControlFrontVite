@@ -1,9 +1,3 @@
-export interface Category {
-  id: string
-  name: string
-  icon: string
-}
-
 export interface NavItem {
   label: string
   icon: string
