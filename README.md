@@ -8,18 +8,18 @@ O sistema permite registrar despesas do dia a dia, acompanhar gastos, cadastrar 
 
 ### Login
 
-Tela de acesso ao sistema.
+Tela de autenticação do sistema.
 
-Atualmente, o login é apenas uma simulação para navegação entre as telas. Não há autenticação real conectada a um servidor.
+O login realiza autenticação real via `POST /api/Auth/login`. As credenciais (e-mail e senha) são enviadas para a API, que retorna um token JWT (`authToken`) e sua data de expiração (`tokenExpiration`), armazenados em cookies. Em caso de sucesso, o usuário é redirecionado ao Dashboard. As demais páginas contam com um componente `ProtectedRoute` que verifica a presença do token e redireciona para `/login` quando ausente.
 
 ### Dashboard
 
 Apresenta um resumo das informações financeiras cadastradas, permitindo visualizar:
 
-* Resumo dos gastos.
-* Despesas recentes.
-* Distribuição das despesas por categoria.
-* Informações gerais sobre os lançamentos.
+- Resumo dos gastos.
+- Despesas recentes.
+- Distribuição das despesas por categoria.
+- Informações gerais sobre os lançamentos.
 
 ### Despesas
 
@@ -27,10 +27,10 @@ Permite registrar e consultar despesas do dia a dia.
 
 O usuário pode:
 
-* Adicionar uma nova despesa.
-* Informar a data, valor, categoria e observação.
-* Visualizar os lançamentos cadastrados.
-* Consultar informações resumidas sobre as despesas.
+- Adicionar uma nova despesa.
+- Informar a data, valor, categoria e observação.
+- Visualizar os lançamentos cadastrados.
+- Consultar informações resumidas sobre as despesas.
 
 ### Despesas Fixas
 
@@ -38,17 +38,9 @@ O usuário pode:
 
 O usuário pode visualizar:
 
-* Contas fixas cadastradas.
-* Valor de cada conta.
-* Situação da conta, como paga ou não paga.
-
-### Categorias
-
-Permite organizar as categorias utilizadas para classificar as despesas.
-
-As categorias são utilizadas nos lançamentos e também no agrupamento das informações apresentadas no Dashboard.
-
----
+- Contas fixas cadastradas.
+- Valor de cada conta.
+- Situação da conta, como paga ou não paga.
 
 ## Estrutura do projeto
 
@@ -101,17 +93,16 @@ Contém as páginas principais da aplicação. Cada página representa uma área
 
 Contém componentes reutilizáveis separados de acordo com sua finalidade:
 
-* `layout/`: estrutura de navegação e layout.
-* `ui/`: componentes visuais genéricos.
-* `dashboard/`: componentes específicos do Dashboard.
-* `expenses/`: componentes relacionados às despesas.
-* `fixed-expenses/`: componentes relacionados às despesas fixas.
-* `categories/`: componentes relacionados às categorias.
+- `layout/`: estrutura de navegação e layout.
+- `ui/`: componentes visuais genéricos.
+- `dashboard/`: componentes específicos do Dashboard.
+- `expenses/`: componentes relacionados às despesas.
+- `fixed-expenses/`: componentes relacionados às despesas fixas.
+- `categories/`: componentes relacionados às categorias.
 
 **`data.ts`**
 
-<<<<<<< Updated upstream
-Atualmente contém os dados utilizados pela aplicação durante o desenvolvimento.
+<<<<<<< Updated upstream Atualmente contém os dados utilizados pela aplicação durante o desenvolvimento.
 
 Esses dados são mockados e podem posteriormente ser substituídos por informações provenientes da API.
 
@@ -147,13 +138,13 @@ Rotas inexistentes também direcionam o usuário para `/login`.
 
 ## Tecnologias
 
-* **React**
-* **TypeScript**
-* **Vite**
-* **Tailwind CSS**
-* **PostCSS**
-* **react-router-dom**
-* **Material Symbols**
+- **React**
+- **TypeScript**
+- **Vite**
+- **Tailwind CSS**
+- **PostCSS**
+- **react-router-dom**
+- **Material Symbols**
 
 O Tailwind CSS é utilizado localmente através do PostCSS, sem dependência do CDN.
 
@@ -161,21 +152,19 @@ O Tailwind CSS é utilizado localmente através do PostCSS, sem dependência do 
 
 ## Funcionamento atual
 
-A aplicação atualmente funciona utilizando **dados simulados**.
+A aplicação consome uma **API real** para autenticação, consulta e persistência dos dados.
 
 O fluxo principal é:
 
 1. O usuário acessa o sistema.
-2. Na tela de login, realiza o acesso.
-3. Após o login, é direcionado para o Dashboard.
+2. Na tela de login, informa e-mail e senha para autenticação.
+3. Após o login bem-sucedido, é direcionado para o Dashboard.
 4. Através do menu lateral, pode acessar despesas, despesas fixas e categorias.
-5. Os lançamentos e demais informações são exibidos utilizando os dados disponíveis no projeto.
+5. Os dados são carregados da API via `src/services/api.ts`, que envia o token JWT no header `Authorization: Bearer` em todas as requisições autenticadas.
 
-O formulário de login atualmente não realiza autenticação em um servidor.
+As páginas autenticadas contam com `ProtectedRoute` para verificar a existência do token — caso não encontrado, o usuário é redirecionado ao login.
 
-As despesas, categorias e despesas fixas também ainda não são persistidas em um banco de dados.
-
-A estrutura do projeto foi organizada para permitir posteriormente a integração com uma API responsável pela autenticação, persistência e consulta dos dados.
+Os dados financeiros (despesas, categorias, despesas fixas) são persistidos em banco de dados através da API, não havendo mais dados mockados no frontend (exceto a configuração estática do menu lateral em `src/config/navigation.ts`).
 
 ---
 
@@ -188,6 +177,7 @@ Em telas maiores, a navegação utiliza uma barra lateral fixa.
 Em dispositivos menores, a navegação lateral pode ser aberta através do menu mobile.
 
 ---
+
 - **`AppShell`** unifica o layout autenticado (Sidebar + TopNavBar + área de conteúdo com `max-w-container-max`) para Dashboard, Daily Expenses, Fixed Expenses e Categories. O Login não usa `AppShell`, pois é uma tela isolada, sem sidebar.
 - **`TopNavBar`** agora sempre mostra o título da página (antes, cada tela decidia isso de um jeito diferente); a busca só aparece quando a página faz sentido para ela (`searchPlaceholder`), como em Categories.
 - **`Sidebar`** ficou fixa em todas as telas autenticadas, com o botão "Add Expense" sempre no topo (era inconsistente entre os protótipos) e o item ativo calculado pela rota atual via `NavLink`, não mais por classes fixas em cada HTML.
