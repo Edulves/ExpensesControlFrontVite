@@ -5,15 +5,30 @@ interface RecentExpensesListProps {
   items: CategoryBreakdownItem[]
 }
 
-// Ícones de categoria já usados no projeto (data.ts). Fallback genérico caso o
-// nome da categoria vindo da API não esteja mapeado.
+// Ícones de categoria (mapeamento por nome da categoria vindo da API).
+// Fallback genérico 'category' caso o nome não esteja mapeado.
 const categoryIcons: Record<string, string> = {
   lanche: 'fastfood',
   mercado: 'shopping_cart',
   uber: 'directions_car',
+  farmacia: 'medication',
+  lazer: 'celebration',
+  'cuidado pessoal': 'spa',
+  'gastos avulsos': 'receipt_long',
+  pao: 'bakery_dining',
+  'adiantamento cartao de credito': 'credit_card',
+  cursos: 'school',
+  'cartao de credito': 'credit_score',
+  'despesas medicas': 'medical_services',
+  'servicos de assinatura': 'subscriptions',
+  investimento: 'trending_up',
+  moradia: 'home',
+  moto: 'motorcycle',
+  games: 'sports_esports',
+  'despesas dentista': 'dentistry',
+  // compatibilidade com nomes alternativos usados anteriormente
   transporte: 'directions_car',
   transport: 'directions_car',
-  farmacia: 'medication',
   aluguel: 'home',
   energia: 'bolt',
   agua: 'water_drop',
@@ -23,7 +38,6 @@ const categoryIcons: Record<string, string> = {
   alimentacao: 'restaurant',
   comida: 'restaurant',
   carro: 'directions_car',
-  moradia: 'home',
   saude: 'medication',
   outros: 'category',
   other: 'category',
