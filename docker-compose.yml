@@ -1,0 +1,9 @@
+services:
+    frontend:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: expensescontrol_frontend
+        restart: unless-stopped
+        ports:
+            - "127.0.0.1:3002:80"
