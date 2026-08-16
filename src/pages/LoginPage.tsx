@@ -20,7 +20,7 @@ export default function LoginPage() {
         setPopup(null);
 
         try {
-            const response = await fetch("https://localhost:7280/api/Auth/login", {
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || ""}/api/Auth/login`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

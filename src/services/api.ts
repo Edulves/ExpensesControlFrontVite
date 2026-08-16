@@ -1,7 +1,7 @@
 import type { Expense } from "../types";
 import { getCookie } from "../utils/cookies";
 
-const API_BASE_URL = "https://localhost:7280";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/";
 
 export interface DailyExpenseResponse {
     dailyExpenseId: number;
@@ -175,12 +175,7 @@ export async function fetchExpensesPerCategory(filters: {
         groups = data;
     } else {
         // Envelopes possíveis quando a lista vem embrulhada
-        const wrapped =
-            data.value ||
-            data.items ||
-            data.data ||
-            data.expensesPerCategory ||
-            data.$values;
+        const wrapped = data.value || data.items || data.data || data.expensesPerCategory || data.$values;
 
         groups = Array.isArray(wrapped) ? wrapped : [data as ExpensesPerCategoryResponse];
     }
@@ -247,8 +242,7 @@ export async function fetchTotalDailyExpenses(filters: {
     if (typeof data === "number") return data;
 
     if (data && typeof data === "object") {
-        const candidate =
-            data.totalExpenses ?? data.total ?? data.totalValue ?? data.value ?? data.amount;
+        const candidate = data.totalExpenses ?? data.total ?? data.totalValue ?? data.value ?? data.amount;
         const num = Number(candidate);
         if (!Number.isNaN(num)) return num;
     }
@@ -317,9 +311,7 @@ export async function fetchFixedExpenses(filters: FixedExpenseFilters): Promise<
     const data = await response.json();
 
     // Tolerante a array direto ou retorno paginado (items/data/fixedExpenses).
-    const rawItems: FixedExpenseApiItem[] = Array.isArray(data)
-        ? data
-        : data.items || data.data || data.fixedExpenses || [];
+    const rawItems: FixedExpenseApiItem[] = Array.isArray(data) ? data : data.items || data.data || data.fixedExpenses || [];
 
     return rawItems
         .filter((item) => !item.isDeleted)
@@ -329,9 +321,7 @@ export async function fetchFixedExpenses(filters: FixedExpenseFilters): Promise<
             tags: [] as string[],
             amount: item.amount,
             status: item.isPaid ? ("paid" as const) : ("unpaid" as const),
-            dueDate: item.fixedExpenseDate
-                ? item.fixedExpenseDate.slice(0, 10).split("-").reverse().join("/")
-                : "",
+            dueDate: item.fixedExpenseDate ? item.fixedExpenseDate.slice(0, 10).split("-").reverse().join("/") : "",
             icon: "receipt_long",
             urgent: !item.isPaid,
         }));
