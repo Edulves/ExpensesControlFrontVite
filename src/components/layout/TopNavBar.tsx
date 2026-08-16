@@ -5,7 +5,7 @@ interface TopNavBarProps {
     onMenuClick?: () => void;
 }
 
-export default function TopNavBar({ title, subtitle, searchPlaceholder, onMenuClick }: TopNavBarProps) {
+export default function TopNavBar({ title, subtitle, onMenuClick }: TopNavBarProps) {
     return (
         <header className="bg-surface w-full border-b border-border-subtle flex flex-col flex-shrink-0 z-30 relative">
             <div className="h-20 flex justify-between items-center px-4 md:px-8">

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AppShell from '../components/layout/AppShell'
 import StatCard from '../components/ui/StatCard'
-import RecentExpensesList from '../components/dashboard/RecentExpensesList'
+
 import CategoryHorizontalBarChart from '../components/dashboard/CategoryHorizontalBarChart'
 import { fetchExpensesPerCategory, fetchTotalDailyExpenses, fetchFixedExpensesConsolidation, type ExpenseByCategory } from '../services/api'
 import { getCookie } from '../utils/cookies'
