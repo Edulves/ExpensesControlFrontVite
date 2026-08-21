@@ -8,11 +8,12 @@ interface TopCategory {
 interface QuickStatsPanelProps {
     totalToday: number;
     topCategories: TopCategory[];
+    className?: string;
 }
 
-export default function QuickStatsPanel({ totalToday, topCategories }: QuickStatsPanelProps) {
+export default function QuickStatsPanel({ totalToday, topCategories, className }: QuickStatsPanelProps) {
     return (
-        <div className="flex flex-col gap-6">
+        <div className={`flex flex-col gap-6 ${className ?? ""}`}>
             {/* Stat Card */}
             <div className="bg-surface-container-lowest border border-border-subtle rounded-xl p-6 flex flex-col justify-center items-center text-center shadow-sm relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-br from-surface-container-low to-surface-bright opacity-50 pointer-events-none" />

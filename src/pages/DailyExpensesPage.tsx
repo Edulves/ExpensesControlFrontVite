@@ -46,6 +46,10 @@ export default function DailyExpensesPage() {
     const [appliedCategory, setAppliedCategory] = useState("");
     const [appliedNote, setAppliedNote] = useState("");
 
+    // Controla a visibilidade dos filtros avançados (De, Até, Observação).
+    const [showAdvanced, setShowAdvanced] = useState(false);
+    const [advancedError, setAdvancedError] = useState<string | null>(null);
+
     const [page, setPage] = useState(1);
     const [qty, setQty] = useState(10);
     const [totalPages, setTotalPages] = useState(1);
@@ -156,9 +160,7 @@ export default function DailyExpensesPage() {
                 }
             } catch (err) {
                 if (!cancelled) {
-                    setCategoryOptionsError(
-                        err instanceof Error ? err.message : "Erro ao carregar categorias.",
-                    );
+                    setCategoryOptionsError(err instanceof Error ? err.message : "Erro ao carregar categorias.");
                 }
             }
         })();
@@ -168,12 +170,39 @@ export default function DailyExpensesPage() {
         };
     }, []);
 
-    const handleApplyFilters = () => {
-        setAppliedMonth(month);
-        setAppliedYear(year);
+    // Filtros imediatos (Mês, Ano, Categoria) — aplicados assim que o campo muda.
+    const handleMonthChange = (value: number) => {
+        setMonth(value);
+        setAppliedMonth(value);
+        setPage(1);
+    };
+
+    const handleYearChange = (value: number) => {
+        setYear(value);
+        setAppliedYear(value);
+        setPage(1);
+    };
+
+    const handleCategoryChange = (value: string) => {
+        setCategory(value);
+        setAppliedCategory(value);
+        setPage(1);
+    };
+
+    // Aplica os filtros avançados (De, Até, Observação) — somente via botão "Aplicar".
+    // Regra: "De" e "Até" precisam ser preenchidos em conjunto (ou nenhum dos dois).
+    const handleApplyAdvanced = () => {
+        const hasStart = Boolean(beginningOfPeriod);
+        const hasEnd = Boolean(endOfPeriod);
+
+        if (hasStart !== hasEnd) {
+            setAdvancedError('Os filtros "De" e "Até" devem ser preenchidos em conjunto.');
+            return;
+        }
+
+        setAdvancedError(null);
         setAppliedBeginningOfPeriod(beginningOfPeriod);
         setAppliedEndOfPeriod(endOfPeriod);
-        setAppliedCategory(category);
         setAppliedNote(note);
         setPage(1);
     };
@@ -198,7 +227,7 @@ export default function DailyExpensesPage() {
             {/* Filters */}
             <div className="flex flex-wrap items-end justify-between gap-3 mb-6 -mt-2">
                 <div className="flex flex-wrap items-end gap-3">
-                    {/* Month Select */}
+                    {/* Month Select — applied immediately */}
                     <div className="space-y-1">
                         <label className="font-label-caps text-xs font-semibold text-on-surface block" htmlFor="month-filter">
                             Mês
@@ -207,7 +236,7 @@ export default function DailyExpensesPage() {
                             id="month-filter"
                             className="bg-surface-container-lowest border border-border-subtle rounded-lg px-3 py-2 font-body-lg text-base text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
                             value={month}
-                            onChange={(e) => setMonth(Number(e.target.value))}
+                            onChange={(e) => handleMonthChange(Number(e.target.value))}
                         >
                             {MONTHS.map((name, index) => (
                                 <option key={index + 1} value={index + 1}>
@@ -217,7 +246,7 @@ export default function DailyExpensesPage() {
                         </select>
                     </div>
 
-                    {/* Year Select */}
+                    {/* Year Select — applied immediately */}
                     <div className="space-y-1">
                         <label className="font-label-caps text-xs font-semibold text-on-surface block" htmlFor="year-filter">
                             Ano
@@ -226,7 +255,7 @@ export default function DailyExpensesPage() {
                             id="year-filter"
                             className="bg-surface-container-lowest border border-border-subtle rounded-lg px-3 py-2 font-body-lg text-base text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
                             value={year}
-                            onChange={(e) => setYear(Number(e.target.value))}
+                            onChange={(e) => handleYearChange(Number(e.target.value))}
                         >
                             {Array.from({ length: 10 }, (_, i) => now.getFullYear() - 5 + i).map((y) => (
                                 <option key={y} value={y}>
@@ -236,35 +265,7 @@ export default function DailyExpensesPage() {
                         </select>
                     </div>
 
-                    {/* Beginning of Period */}
-                    <div className="space-y-1">
-                        <label className="font-label-caps text-xs font-semibold text-on-surface block" htmlFor="begin-filter">
-                            De
-                        </label>
-                        <input
-                            id="begin-filter"
-                            type="date"
-                            value={beginningOfPeriod}
-                            onChange={(e) => setBeginningOfPeriod(e.target.value)}
-                            className="bg-surface-container-lowest border border-border-subtle rounded-lg px-3 py-2 font-body-lg text-base text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
-                        />
-                    </div>
-
-                    {/* End of Period */}
-                    <div className="space-y-1">
-                        <label className="font-label-caps text-xs font-semibold text-on-surface block" htmlFor="end-filter">
-                            Até
-                        </label>
-                        <input
-                            id="end-filter"
-                            type="date"
-                            value={endOfPeriod}
-                            onChange={(e) => setEndOfPeriod(e.target.value)}
-                            className="bg-surface-container-lowest border border-border-subtle rounded-lg px-3 py-2 font-body-lg text-base text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
-                        />
-                    </div>
-
-                    {/* Category Select */}
+                    {/* Category Select — applied immediately */}
                     <div className="space-y-1">
                         <label className="font-label-caps text-xs font-semibold text-on-surface block" htmlFor="category-filter">
                             Categoria
@@ -273,7 +274,7 @@ export default function DailyExpensesPage() {
                             id="category-filter"
                             className="bg-surface-container-lowest border border-border-subtle rounded-lg px-3 py-2 font-body-lg text-base text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
                             value={category}
-                            onChange={(e) => setCategory(e.target.value)}
+                            onChange={(e) => handleCategoryChange(e.target.value)}
                         >
                             <option value="">Todas as categorias</option>
                             {categoryOptions.map((c) => (
@@ -282,35 +283,22 @@ export default function DailyExpensesPage() {
                                 </option>
                             ))}
                         </select>
-                        {categoryOptionsError && (
-                            <p className="font-label-caps text-xs text-negative-rose mt-1">
-                                {categoryOptionsError}
-                            </p>
-                        )}
+                        {categoryOptionsError && <p className="font-label-caps text-xs text-negative-rose mt-1">{categoryOptionsError}</p>}
                     </div>
 
-                    {/* Note Input */}
+                    {/* Advanced filters toggle */}
                     <div className="space-y-1">
-                        <label className="font-label-caps text-xs font-semibold text-on-surface block" htmlFor="note-filter">
-                            Observação
-                        </label>
-                        <input
-                            id="note-filter"
-                            type="text"
-                            placeholder="Buscar observação..."
-                            value={note}
-                            onChange={(e) => setNote(e.target.value)}
-                            className="bg-surface-container-lowest border border-border-subtle rounded-lg px-3 py-2 font-body-lg text-base text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
-                        />
+                        <button
+                            type="button"
+                            onClick={() => setShowAdvanced((v) => !v)}
+                            aria-expanded={showAdvanced}
+                            className="inline-flex items-center gap-1 bg-surface-container-lowest border border-border-subtle rounded-lg px-3 py-2 font-label-caps text-xs font-semibold text-on-surface hover:border-primary hover:text-primary transition-colors"
+                        >
+                            <span className="material-symbols-outlined text-[16px]">tune</span>
+                            Filtros avançados
+                            <span className="material-symbols-outlined text-[16px]">{showAdvanced ? "expand_less" : "expand_more"}</span>
+                        </button>
                     </div>
-
-                    {/* Apply Button */}
-                    <button
-                        onClick={handleApplyFilters}
-                        className="bg-primary text-on-primary rounded-lg py-2 px-4 items-center justify-center gap-2 hover:bg-primary-container transition-colors shadow-sm font-label-caps text-xs font-semibold"
-                    >
-                        Aplicar
-                    </button>
                 </div>
 
                 <div className="flex">
@@ -325,6 +313,67 @@ export default function DailyExpensesPage() {
                     </button>
                 </div>
             </div>
+
+            {/* Advanced filters (hidden by default) — applied only on "Aplicar" */}
+            {showAdvanced && (
+                <div className="mb-6 -mt-2 p-4 bg-surface-container-lowest border border-border-subtle rounded-xl space-y-3">
+                    <h3 className="font-label-caps text-xs font-semibold text-on-surface-variant">Filtros avançados</h3>
+                    <div className="flex flex-wrap items-end gap-3">
+                        {/* Beginning of Period */}
+                        <div className="space-y-1">
+                            <label className="font-label-caps text-xs font-semibold text-on-surface block" htmlFor="begin-filter">
+                                De
+                            </label>
+                            <input
+                                id="begin-filter"
+                                type="date"
+                                value={beginningOfPeriod}
+                                onChange={(e) => setBeginningOfPeriod(e.target.value)}
+                                className="bg-surface-container-lowest border border-border-subtle rounded-lg px-3 py-2 font-body-lg text-base text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+                            />
+                        </div>
+
+                        {/* End of Period */}
+                        <div className="space-y-1">
+                            <label className="font-label-caps text-xs font-semibold text-on-surface block" htmlFor="end-filter">
+                                Até
+                            </label>
+                            <input
+                                id="end-filter"
+                                type="date"
+                                value={endOfPeriod}
+                                onChange={(e) => setEndOfPeriod(e.target.value)}
+                                className="bg-surface-container-lowest border border-border-subtle rounded-lg px-3 py-2 font-body-lg text-base text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+                            />
+                        </div>
+
+                        {/* Note Input */}
+                        <div className="space-y-1">
+                            <label className="font-label-caps text-xs font-semibold text-on-surface block" htmlFor="note-filter">
+                                Observação
+                            </label>
+                            <input
+                                id="note-filter"
+                                type="text"
+                                placeholder="Buscar observação..."
+                                value={note}
+                                onChange={(e) => setNote(e.target.value)}
+                                className="bg-surface-container-lowest border border-border-subtle rounded-lg px-3 py-2 font-body-lg text-base text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+                            />
+                        </div>
+
+                        {/* Apply Advanced Button */}
+                        <button
+                            type="button"
+                            onClick={handleApplyAdvanced}
+                            className="bg-primary text-on-primary rounded-lg py-2 px-4 items-center justify-center gap-2 hover:bg-primary-container transition-colors shadow-sm font-label-caps text-xs font-semibold"
+                        >
+                            Aplicar
+                        </button>
+                    </div>
+                    {advancedError && <p className="font-label-caps text-xs text-negative-rose">{advancedError}</p>}
+                </div>
+            )}
 
             {loading ? (
                 <div className="flex items-center justify-center py-16">
@@ -348,57 +397,71 @@ export default function DailyExpensesPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <ExpensesTable expenses={expenses} onEdit={handleEdit} onDelete={handleDelete} />
                     <QuickStatsPanel totalToday={totalToday} topCategories={topCategories} />
+                    {/* Paginação: na versão responsiva fica logo abaixo da tabela (e não como último
+                        elemento da página); no desktop ocupa a linha inteira na base do grid. */}
+                    <div className="order-1 lg:order-2 lg:col-span-3 flex flex-wrap items-center justify-between gap-3">
+                        <div className="flex items-center gap-2">
+                            <label className="font-label-caps text-xs font-semibold text-on-surface-variant" htmlFor="qty-filter">
+                                Linhas por página
+                            </label>
+                            <select
+                                id="qty-filter"
+                                className="bg-surface-container-lowest border border-border-subtle rounded-lg px-2 py-1.5 font-body-sm text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+                                value={qty}
+                                onChange={(e) => {
+                                    setQty(Number(e.target.value));
+                                    setPage(1);
+                                }}
+                            >
+                                {[5, 10, 25, 50, 100].map((n) => (
+                                    <option key={n} value={n}>
+                                        {n}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <button
+                                type="button"
+                                disabled={page <= 1}
+                                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                                className="px-3 py-1.5 rounded-lg border border-border-subtle font-label-caps text-xs font-semibold text-primary hover:bg-surface-container-low transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                            >
+                                Anterior
+                            </button>
+                            <span className="font-label-caps text-xs font-semibold text-on-surface-variant">
+                                Página {page} de {Math.max(1, totalPages)} · {totalItems} item(ns)
+                            </span>
+                            <button
+                                type="button"
+                                disabled={page >= totalPages}
+                                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                                className="px-3 py-1.5 rounded-lg border border-border-subtle font-label-caps text-xs font-semibold text-primary hover:bg-surface-container-low transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                            >
+                                Próxima
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
 
-            {!loading && !error && (
-                <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
-                    <div className="flex items-center gap-2">
-                        <label className="font-label-caps text-xs font-semibold text-on-surface-variant" htmlFor="qty-filter">
-                            Linhas por página
-                        </label>
-                        <select
-                            id="qty-filter"
-                            className="bg-surface-container-lowest border border-border-subtle rounded-lg px-2 py-1.5 font-body-sm text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
-                            value={qty}
-                            onChange={(e) => {
-                                setQty(Number(e.target.value));
-                                setPage(1);
-                            }}
-                        >
-                            {[5, 10, 25, 50, 100].map((n) => (
-                                <option key={n} value={n}>
-                                    {n}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <button
-                            type="button"
-                            disabled={page <= 1}
-                            onClick={() => setPage((p) => Math.max(1, p - 1))}
-                            className="px-3 py-1.5 rounded-lg border border-border-subtle font-label-caps text-xs font-semibold text-primary hover:bg-surface-container-low transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                        >
-                            Anterior
-                        </button>
-                        <span className="font-label-caps text-xs font-semibold text-on-surface-variant">
-                            Página {page} de {Math.max(1, totalPages)} · {totalItems} item(ns)
-                        </span>
-                        <button
-                            type="button"
-                            disabled={page >= totalPages}
-                            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                            className="px-3 py-1.5 rounded-lg border border-border-subtle font-label-caps text-xs font-semibold text-primary hover:bg-surface-container-low transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                        >
-                            Próxima
-                        </button>
-                    </div>
-                </div>
-            )}
-
-            <AddExpenseModal open={modalOpen} onClose={() => setModalOpen(false)} onSaved={() => { setPage(1); loadData(); }} />
-            <EditExpenseModal open={editing !== null} expense={editing} onClose={() => setEditing(null)} onSaved={() => { setPage(1); loadData(); }} />
+            <AddExpenseModal
+                open={modalOpen}
+                onClose={() => setModalOpen(false)}
+                onSaved={() => {
+                    setPage(1);
+                    loadData();
+                }}
+            />
+            <EditExpenseModal
+                open={editing !== null}
+                expense={editing}
+                onClose={() => setEditing(null)}
+                onSaved={() => {
+                    setPage(1);
+                    loadData();
+                }}
+            />
 
             {/* Mobile FAB for adding expense */}
             <button
