@@ -50,6 +50,7 @@ export default {
         'on-background': '#0b1c30',
         'on-surface': '#0b1c30',
         'negative-rose': '#F43F5E',
+        'negative-rose-dark': '#c1314a',
         'outline-variant': '#c3c6ce',
         'on-secondary': '#ffffff',
         'surface-dim': '#cbdbf5',
