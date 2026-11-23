@@ -12,11 +12,20 @@ const categoryPillClasses: Record<string, string> = {
     uber: "bg-surface-tint/10 text-surface-tint",
 };
 
+// "2026-11-04" ou "2026-11-04T00:00:00" -> "04/11/2026" (sem conversão de fuso).
+function formatDate(value: string): string {
+    const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(value ?? "");
+    return match ? `${match[3]}/${match[2]}/${match[1]}` : value;
+}
+
 export default function ExpensesTable({ expenses, onEdit, onDelete }: ExpensesTableProps) {
     return (
-        <div className="lg:col-span-2 bg-surface-container-lowest border border-border-subtle rounded-xl p-0 overflow-hidden flex flex-col">
-            {/* Desktop table (lg and above) */}
-            <div className="hidden lg:block overflow-x-auto flex-grow">
+        <div className="xl:col-span-2 bg-surface-container-lowest border border-border-subtle rounded-xl p-0 overflow-hidden flex flex-col">
+            {/* Desktop table (xl and above) */}
+            {expenses.length === 0 && (
+                <p className="font-body-sm text-sm text-on-surface-variant p-6 text-center">Nenhuma despesa encontrada no período.</p>
+            )}
+            <div className="hidden xl:block overflow-x-auto flex-grow">
                 <table className="w-full text-left border-collapse">
                     <thead>
                         <tr className="border-b border-border-subtle bg-surface-container-low">
@@ -35,9 +44,9 @@ export default function ExpensesTable({ expenses, onEdit, onDelete }: ExpensesTa
                             >
                                 <td className="py-3 px-6 text-on-surface-variant whitespace-nowrap">
                                     <div className="absolute left-0 top-0 bottom-0 w-1 bg-negative-rose opacity-0 group-hover:opacity-100 transition-opacity" />
-                                    {expense.date}
+                                    {formatDate(expense.date)}
                                 </td>
-                                <td className="py-3 px-6 font-medium text-on-surface">{expense.description}</td>
+                                <td className="py-3 px-6 font-medium text-on-surface break-words">{expense.description}</td>
                                 <td className="py-3 px-6">
                                     <span
                                         className={`inline-flex items-center gap-1 px-2 py-1 rounded font-label-caps text-[10px] ${
@@ -47,7 +56,7 @@ export default function ExpensesTable({ expenses, onEdit, onDelete }: ExpensesTa
                                         {expense.categoryLabel}
                                     </span>
                                 </td>
-                                <td className="py-3 px-6 text-right font-label-numeric text-sm font-medium text-on-surface">
+                                <td className="py-3 px-6 text-right whitespace-nowrap font-label-numeric text-sm font-medium text-on-surface">
                                     {(-expense.amount).toLocaleString("pt-BR", {
                                         style: "currency",
                                         currency: "BRL",
@@ -80,7 +89,7 @@ export default function ExpensesTable({ expenses, onEdit, onDelete }: ExpensesTa
             </div>
 
             {/* Mobile & tablet: stacked cards to avoid horizontal scroll */}
-            <div className="lg:hidden flex flex-col">
+            <div className="xl:hidden flex flex-col">
                 {expenses.map((expense) => (
                     <div
                         key={expense.id}
@@ -88,7 +97,7 @@ export default function ExpensesTable({ expenses, onEdit, onDelete }: ExpensesTa
                     >
                         <div className="absolute left-0 top-0 bottom-0 w-1 bg-negative-rose opacity-40" />
                         <div className="flex items-center justify-between gap-3">
-                            <span className="font-body-sm text-base text-on-surface-variant">{expense.date}</span>
+                            <span className="font-body-sm text-base text-on-surface-variant">{formatDate(expense.date)}</span>
                             <span className="font-label-numeric text-base font-medium text-on-surface">
                                 {(-expense.amount).toLocaleString("pt-BR", {
                                     style: "currency",
@@ -96,7 +105,7 @@ export default function ExpensesTable({ expenses, onEdit, onDelete }: ExpensesTa
                                 })}
                             </span>
                         </div>
-                        <div className="mt-2 font-medium text-on-surface">{expense.description}</div>
+                        <div className="mt-2 font-medium text-on-surface break-words">{expense.description}</div>
                         <div className="mt-2 flex items-center justify-between gap-3">
                             <span
                                 className={`inline-flex items-center gap-1 px-2 py-1 rounded font-label-caps text-[10px] ${

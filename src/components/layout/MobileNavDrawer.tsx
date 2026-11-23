@@ -32,7 +32,7 @@ export default function MobileNavDrawer({ open, onClose }: MobileNavDrawerProps)
                             <p className="font-label-md text-label-md text-on-surface-variant opacity-70">Calma Financeira</p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="text-on-surface-variant p-2 rounded-full hover:bg-surface-container transition-colors">
+                    <button onClick={onClose} aria-label="Fechar menu" className="text-on-surface-variant p-2 rounded-full hover:bg-surface-container transition-colors">
                         <span className="material-symbols-outlined">close</span>
                     </button>
                 </div>
@@ -45,8 +45,8 @@ export default function MobileNavDrawer({ open, onClose }: MobileNavDrawerProps)
                             onClick={onClose}
                             className={({ isActive }) =>
                                 isActive
-                                    ? "flex items-center gap-3 px-2 py-1 rounded-lg bg-surface-container text-primary font-bold font-label-md text-label-md "
-                                    : "flex items-center gap-3 px-2 py-1 rounded-lg text-on-surface-variant opacity-70 hover:bg-surface-container-low transition-all font-label-caps text-xs font-semibold"
+                                    ? "flex items-center gap-3 px-2 py-2 rounded-lg bg-surface-container text-primary font-bold text-base"
+                                    : "flex items-center gap-3 px-2 py-2 rounded-lg text-on-surface-variant opacity-70 hover:bg-surface-container-low transition-all text-base font-semibold"
                             }
                         >
                             {({ isActive }) => (
@@ -68,7 +68,7 @@ export default function MobileNavDrawer({ open, onClose }: MobileNavDrawerProps)
                             e.preventDefault();
                             handleLogout();
                         }}
-                        className="flex items-center gap-3 px-2 py-1 rounded-lg text-on-surface-variant opacity-70 hover:bg-surface-container-low transition-all font-label-caps text-xs font-semibold"
+                        className="flex items-center gap-3 px-2 py-2 rounded-lg text-on-surface-variant opacity-70 hover:bg-surface-container-low transition-all text-base font-semibold"
                     >
                         <span className="material-symbols-outlined">logout</span>
                         <span>Sair</span>

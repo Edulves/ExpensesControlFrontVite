@@ -13,6 +13,7 @@ export default function TopNavBar({ title, subtitle, onMenuClick }: TopNavBarPro
                     {/* Mobile Menu Button */}
                     <button
                         onClick={onMenuClick}
+                        aria-label="Abrir menu"
                         className="md:hidden text-on-surface-variant p-2 -ml-2 rounded-full hover:bg-surface-container transition-colors flex-shrink-0"
                     >
                         <span className="material-symbols-outlined">menu</span>

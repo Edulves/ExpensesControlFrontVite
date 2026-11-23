@@ -16,12 +16,17 @@ interface EntryRow {
   fixedExpenseDate: string
 }
 
-const today = new Date().toISOString().slice(0, 10)
+// Data local (yyyy-MM-dd). toISOString() usaria UTC e, no Brasil, após as 21h
+// retornaria o dia seguinte.
+const todayLocal = () => {
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
 
 const emptyRow = (): EntryRow => ({
   description: '',
   amount: '',
-  fixedExpenseDate: today,
+  fixedExpenseDate: todayLocal(),
 })
 
 export default function AddFixedExpenseModal({ open, onClose, onSaved, copyMonth, copyYear }: AddFixedExpenseModalProps) {
@@ -68,7 +73,7 @@ export default function AddFixedExpenseModal({ open, onClose, onSaved, copyMonth
       const newRows: EntryRow[] = sourceExpenses.map((exp: FixedExpense) => ({
         description: exp.description,
         amount: String(exp.amount),
-        fixedExpenseDate: today,
+        fixedExpenseDate: todayLocal(),
       }))
       setRows(newRows)
       setCopiedCount(sourceExpenses.length)

@@ -143,9 +143,9 @@ export default function DashboardPage() {
 
                 <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-12 gap-6 grid-rows-[auto_1fr]">
                     {/* Summary Cards Row */}
-                    <div className="lg:col-span-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="lg:col-span-12 grid grid-cols-1 xl:grid-cols-3 gap-6">
                         <StatCard label="Total de Despesas" sublabel="Este Mês" icon="account_balance" accentColor="bg-negative-rose">
-                            <span className="font-display-lg  md:text-5xl text-4xl font-bold text-primary">
+                            <span className="font-display-lg text-4xl xl:text-3xl 2xl:text-5xl font-bold text-primary whitespace-nowrap">
                                 R${" "}
                                 <span className="font-label-numeric">
                                     {totalExpenses.toLocaleString("pt-BR", {
@@ -157,7 +157,7 @@ export default function DashboardPage() {
                         </StatCard>
 
                         <StatCard label="Despesas Fixas" sublabel="Valor pago no mês" icon="event_repeat">
-                            <span className="font-title-md md:text-4xl text-3xl font-semibold text-primary ">
+                            <span className="font-title-md text-3xl 2xl:text-4xl font-semibold text-primary whitespace-nowrap">
                                 R${" "}
                                 <span className="font-label-numeric">
                                     {fixedPaid.toLocaleString("pt-BR", {
@@ -170,7 +170,7 @@ export default function DashboardPage() {
 
                         <StatCard label="Despesas fixas em aberto" sublabel="Valor pendente no mês" icon="savings">
                             <span
-                                className={`font-title-md md:text-4xl text-3xl  font-semibold  ${fixedPending > 0 ? "text-negative-rose" : "text-positive-emerald"}`}
+                                className={`font-title-md text-3xl 2xl:text-4xl font-semibold whitespace-nowrap ${fixedPending > 0 ? "text-negative-rose" : "text-positive-emerald"}`}
                             >
                                 R${" "}
                                 <span className="font-label-numeric">

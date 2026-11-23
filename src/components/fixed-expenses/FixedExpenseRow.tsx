@@ -11,10 +11,10 @@ export default function FixedExpenseRow({ expense, onTogglePaid, onEdit, onDelet
     const stripeColor = expense.urgent ? "bg-warning-amber" : "bg-border-subtle";
 
     return (
-        <div className="relative grid grid-cols-1 md:grid-cols-12 gap-4 p-4 border-b border-border-subtle last:border-b-0 items-center hover:bg-surface-bright transition-colors group">
+        <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-4 p-4 border-b border-border-subtle last:border-b-0 items-center hover:bg-surface-bright transition-colors group">
             <div className={`absolute left-0 top-0 bottom-0 w-1 ${stripeColor}`} />
 
-            <div className="col-span-1 md:col-span-5 flex items-center gap-3 pl-3">
+            <div className="col-span-1 lg:col-span-5 flex items-center gap-3 pl-3 min-w-0">
                 <div className="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant flex-shrink-0">
                     <span className="material-symbols-outlined">{expense.icon}</span>
                 </div>
@@ -24,15 +24,15 @@ export default function FixedExpenseRow({ expense, onTogglePaid, onEdit, onDelet
             </div>
 
             <div
-                className={`col-span-1 md:col-span-2 flex justify-between md:justify-end md:text-right font-label-numeric text-base font-medium ${
+                className={`col-span-1 lg:col-span-2 flex justify-between lg:justify-end lg:text-right whitespace-nowrap font-label-numeric text-base font-medium ${
                     expense.status === "paid" ? "text-on-surface-variant" : "text-on-background"
                 }`}
             >
-                <span className="md:hidden text-on-surface-variant">Valor:</span>
+                <span className="lg:hidden text-on-surface-variant">Valor:</span>
                 <span>{expense.amount.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</span>
             </div>
 
-            <div className="col-span-1 md:col-span-2 flex justify-start md:justify-center">
+            <div className="col-span-1 lg:col-span-2 flex justify-start lg:justify-center">
                 {expense.status === "paid" ? (
                     <button
                         type="button"
@@ -63,16 +63,17 @@ export default function FixedExpenseRow({ expense, onTogglePaid, onEdit, onDelet
                 )}
             </div>
 
-            <div className="col-span-1 md:col-span-2 flex justify-between md:justify-end md:text-right font-body-sm text-base text-on-surface-variant">
-                <span className="md:hidden">Vence:</span>
+            <div className="col-span-1 lg:col-span-2 flex justify-between lg:justify-end lg:text-right font-body-sm text-base text-on-surface-variant">
+                <span className="lg:hidden">Vence:</span>
                 <span className={expense.urgent ? "font-bold text-on-background" : undefined}>{expense.dueDate}</span>
             </div>
 
-            <div className="hidden md:flex col-span-1 justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="flex col-span-1 justify-end lg:justify-center border-t border-border-subtle pt-2 lg:border-0 lg:pt-0 transition-opacity [@media(hover:hover)_and_(min-width:1024px)]:opacity-0 group-hover:opacity-100 focus-within:opacity-100">
                 <div className="inline-flex items-center justify-center gap-1">
                     <button
                         type="button"
                         title="Editar"
+                        aria-label="Editar"
                         onClick={() => onEdit?.(expense)}
                         className="text-on-surface-variant hover:text-primary transition-colors p-1 rounded"
                     >
@@ -81,6 +82,7 @@ export default function FixedExpenseRow({ expense, onTogglePaid, onEdit, onDelet
                     <button
                         type="button"
                         title="Excluir"
+                        aria-label="Excluir"
                         onClick={() => onDelete?.(expense)}
                         className="text-on-surface-variant hover:text-negative-rose transition-colors p-1 rounded"
                     >

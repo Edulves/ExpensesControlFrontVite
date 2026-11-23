@@ -100,7 +100,8 @@ export default function FixedExpensesPage() {
         if (!window.confirm(`Excluir "${expense.description}"? Esta ação não pode ser desfeita.`)) return;
         try {
             await deleteFixedExpense(Number(expense.id));
-            setFixedExpenses((prev) => prev.filter((e) => e.id !== expense.id));
+            // Recarrega lista e totais (cards de consolidação) do servidor.
+            loadFixedExpenses(month, year);
         } catch (err) {
             setError(err instanceof Error ? err.message : "Erro ao excluir despesa fixa.");
         }
@@ -164,7 +165,7 @@ export default function FixedExpensesPage() {
             </div>
 
             {/* Bento Grid Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
                 <div className="bg-surface-container-lowest p-6 rounded-xl border border-border-subtle flex flex-col justify-between">
                     <div className="flex items-center gap-2 mb-2">
                         <span className="material-symbols-outlined text-on-surface-variant">payments</span>
@@ -176,7 +177,7 @@ export default function FixedExpensesPage() {
                         const total = consolidation ? consolidation.paidValue + consolidation.notPaidValue : 0;
                         const { i, d } = fmtAmount(total);
                         return (
-                            <div className="font-display-lg text-5xl font-bold text-primary mt-2">
+                            <div className="font-display-lg text-4xl 2xl:text-5xl font-bold whitespace-nowrap text-primary mt-2">
                                 <span className="font-label-numeric text-xl font-semibold align-top">R$</span>
                                 {i}
                                 <span className="font-label-numeric text-xl font-semibold">,{d}</span>
@@ -197,7 +198,7 @@ export default function FixedExpensesPage() {
                         const { i, d } = fmtAmount(paid);
                         return (
                             <div>
-                                <div className="font-display-lg text-5xl font-bold text-on-background mt-2">
+                                <div className="font-display-lg text-4xl 2xl:text-5xl font-bold whitespace-nowrap text-on-background mt-2">
                                     <span className="font-label-numeric text-xl font-semibold align-top">R$</span>
                                     {i}
                                     <span className="font-label-numeric text-xl font-semibold">,{d}</span>
@@ -219,7 +220,7 @@ export default function FixedExpensesPage() {
                         const pend = consolidation ? consolidation.notPaidValue : 0;
                         const { i, d } = fmtAmount(pend);
                         return (
-                            <div className="font-display-lg text-5xl font-bold text-on-background mt-2">
+                            <div className="font-display-lg text-4xl 2xl:text-5xl font-bold whitespace-nowrap text-on-background mt-2">
                                 <span className="font-label-numeric text-xl font-semibold align-top">R$</span>
                                 {i}
                                 <span className="font-label-numeric text-xl font-semibold">,{d}</span>
@@ -232,7 +233,7 @@ export default function FixedExpensesPage() {
             {/* Main Content Area: Fixed Expenses List */}
             <div className="bg-surface-container-lowest rounded-xl border border-border-subtle overflow-hidden">
                 {/* List Header (Desktop) */}
-                <div className="hidden md:grid grid-cols-12 gap-4 p-4 border-b border-border-subtle bg-surface-container-low text-on-surface-variant font-label-caps text-xs font-semibold uppercase tracking-wider">
+                <div className="hidden lg:grid grid-cols-12 gap-4 p-4 border-b border-border-subtle bg-surface-container-low text-on-surface-variant font-label-caps text-xs font-semibold uppercase tracking-wider">
                     <div className="col-span-5 pl-2">Descrição</div>
                     <div className="col-span-2 text-right">Valor</div>
                     <div className="col-span-2 text-center">Status</div>
@@ -294,6 +295,7 @@ export default function FixedExpensesPage() {
             {/* Mobile FAB for adding fixed expense */}
             <button
                 onClick={() => setShowAddModal(true)}
+                aria-label="Adicionar despesa"
                 className="md:hidden fixed bottom-4 right-4 w-14 h-14 bg-primary text-on-primary rounded-full shadow-lg flex items-center justify-center z-40 active:scale-95 transition-transform"
             >
                 <span className="material-symbols-outlined text-[24px]" data-weight="fill">

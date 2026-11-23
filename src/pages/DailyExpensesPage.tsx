@@ -266,13 +266,13 @@ export default function DailyExpensesPage() {
                     </div>
 
                     {/* Category Select — applied immediately */}
-                    <div className="space-y-1">
+                    <div className="space-y-1 w-full sm:w-auto min-w-0">
                         <label className="font-label-caps text-xs font-semibold text-on-surface block" htmlFor="category-filter">
                             Categoria
                         </label>
                         <select
                             id="category-filter"
-                            className="bg-surface-container-lowest border border-border-subtle rounded-lg px-3 py-2 font-body-lg text-base text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+                            className="w-full sm:w-auto sm:max-w-xs bg-surface-container-lowest border border-border-subtle rounded-lg px-3 py-2 font-body-lg text-base text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
                             value={category}
                             onChange={(e) => handleCategoryChange(e.target.value)}
                         >
@@ -394,12 +394,12 @@ export default function DailyExpensesPage() {
                     </button>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
                     <ExpensesTable expenses={expenses} onEdit={handleEdit} onDelete={handleDelete} />
-                    <QuickStatsPanel totalToday={totalToday} topCategories={topCategories} />
+                    <QuickStatsPanel totalToday={totalToday} topCategories={topCategories} className="order-2 xl:order-1" />
                     {/* Paginação: na versão responsiva fica logo abaixo da tabela (e não como último
                         elemento da página); no desktop ocupa a linha inteira na base do grid. */}
-                    <div className="order-1 lg:order-2 lg:col-span-3 flex flex-wrap items-center justify-between gap-3">
+                    <div className="order-1 xl:order-2 xl:col-span-3 flex flex-wrap items-center justify-between gap-3">
                         <div className="flex items-center gap-2">
                             <label className="font-label-caps text-xs font-semibold text-on-surface-variant" htmlFor="qty-filter">
                                 Linhas por página
@@ -466,6 +466,7 @@ export default function DailyExpensesPage() {
             {/* Mobile FAB for adding expense */}
             <button
                 onClick={() => setModalOpen(true)}
+                aria-label="Adicionar despesa"
                 className="md:hidden fixed bottom-4 right-4 w-14 h-14 bg-primary text-on-primary rounded-full shadow-lg flex items-center justify-center z-40 active:scale-95 transition-transform"
             >
                 <span className="material-symbols-outlined text-[24px]" data-weight="fill">
