@@ -187,7 +187,7 @@ export default function AddExpenseModal({ open, onClose, onSaved }: AddExpenseMo
                   {categs.length === 0 && <option value="">Carregando categorias...</option>}
                   {categs.map((c) => (
                     <option key={c.transactionCategoryId} value={c.transactionCategoryId}>
-                      {c.name.charAt(0).toUpperCase() + c.name.slice(1)}
+                      {c.name}
                     </option>
                   ))}
                 </select>

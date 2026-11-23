@@ -19,6 +19,7 @@ function toBreakdownItems(categories: ExpenseByCategory[], total: number): Categ
 
     return categories.map((category) => ({
         categoryId: category.categoryId,
+        transactionCategoryId: category.transactionCategoryId,
         label: category.label,
         percent: sum > 0 ? Math.round((category.amount / sum) * 100) : 0,
         amount: category.amount,

@@ -104,6 +104,7 @@ export async function fetchDailyExpenses(filters: DailyExpenseFilters): Promise<
 
 export interface ExpenseByCategory {
     categoryId: string;
+    transactionCategoryId?: number;
     label: string;
     amount: number;
     color: string;
@@ -111,6 +112,7 @@ export interface ExpenseByCategory {
 
 interface ExpensesPerCategoryResponse {
     dailyExpensesByCategoryList: {
+        transactionCategoryId?: number;
         categoryName: string;
         expenseValue: number;
     }[];
@@ -165,11 +167,19 @@ export async function fetchExpensesPerCategory(filters: {
 
     const url = `${API_BASE_URL}/DataConsolidation/ExpensesPerCategory?${params.toString()}`;
 
-    const response = await authFetch(url, {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
-    });
+    // O consolidado só traz o nome da categoria; buscamos a lista de categorias em
+    // paralelo para resolver o transactionCategoryId (usado no ícone). Se essa
+    // busca falhar, o dashboard continua funcionando com o ícone genérico.
+    const [response, transactionCategories] = await Promise.all([
+        authFetch(url, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }),
+        fetchTransactionCategories().catch(() => [] as TransactionCategory[]),
+    ]);
+
+    const idByName = new Map(transactionCategories.map((c) => [c.name.trim().toLowerCase(), c.transactionCategoryId]));
 
     // O backend responde 400/404 quando não há lançamentos no período.
     if (isEmptyPeriodStatus(response.status)) {
@@ -205,6 +215,9 @@ export async function fetchExpensesPerCategory(filters: {
         total,
         categories: categories.map((category, index) => ({
             categoryId: category.categoryName,
+            // Usa o Id do próprio consolidado se o backend passar a enviá-lo.
+            transactionCategoryId:
+                category.transactionCategoryId ?? idByName.get((category.categoryName ?? "").trim().toLowerCase()),
             label: category.categoryName,
             amount: category.expenseValue,
             color: CATEGORY_COLORS[index % CATEGORY_COLORS.length],

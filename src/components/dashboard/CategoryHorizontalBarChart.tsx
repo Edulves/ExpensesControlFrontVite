@@ -1,52 +1,11 @@
 import type { CategoryBreakdownItem } from "../../types";
 import { colorHex } from "./categoryColors";
+import { iconForCategory } from "./categoryIcons";
 
 interface CategoryHorizontalBarChartProps {
     items: CategoryBreakdownItem[];
     topCategoryLabel: string;
     onHoverChange?: (item: CategoryBreakdownItem | null) => void;
-}
-
-// Ícones por categoria (mapeamento por nome da categoria)
-const categoryIcons: Record<string, string> = {
-    lanche: "fastfood",
-    mercado: "shopping_cart",
-    uber: "directions_car",
-    farmacia: "medication",
-    lazer: "celebration",
-    "cuidado pessoal": "spa",
-    "gastos avulsos": "receipt_long",
-    pao: "bakery_dining",
-    "adiantamento cartao de credito": "credit_card",
-    cursos: "school",
-    "cartao de credito": "credit_score",
-    "despesas medicas": "medical_services",
-    "servicos de assinatura": "subscriptions",
-    investimento: "trending_up",
-    moradia: "home",
-    moto: "motorcycle",
-    games: "sports_esports",
-    "despesas dentista": "dentistry",
-    // compatibilidade com nomes alternativos usados anteriormente
-    transporte: "directions_car",
-    transport: "directions_car",
-    aluguel: "home",
-    energia: "bolt",
-    agua: "water_drop",
-    internet: "wifi",
-    celular: "phone_iphone",
-    assinaturas: "movie",
-    alimentacao: "restaurant",
-    comida: "restaurant",
-    carro: "directions_car",
-    saude: "medication",
-    outros: "category",
-    other: "category",
-};
-
-function iconFor(item: CategoryBreakdownItem): string {
-    const key = (item.categoryId || item.label || "").toLowerCase();
-    return categoryIcons[key] ?? "category";
 }
 
 export default function CategoryHorizontalBarChart({ items, topCategoryLabel, onHoverChange }: CategoryHorizontalBarChartProps) {
@@ -82,12 +41,12 @@ export default function CategoryHorizontalBarChart({ items, topCategoryLabel, on
                                     className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
                                     style={{ backgroundColor: `${hex}18`, color: hex }}
                                 >
-                                    <span className="material-symbols-outlined text-xl">{iconFor(item)}</span>
+                                    <span className="material-symbols-outlined text-xl">{iconForCategory(item.transactionCategoryId)}</span>
                                 </div>
 
                                 {/* Labels */}
                                 <div className="flex-1 min-w-0">
-                                    <h4 className="font-body-lg text-sm font-medium text-on-surface truncate capitalize">
+                                    <h4 className="font-body-lg text-sm font-medium text-on-surface truncate">
                                         {item.label}
                                         {isTop && <span className="ml-1.5 font-label-caps text-[10px] text-positive-emerald">TOP</span>}
                                     </h4>

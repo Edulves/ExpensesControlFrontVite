@@ -91,7 +91,7 @@ export default function CategoryDonutChart({
       >
         <div className="absolute inset-[16px] bg-surface-container-lowest rounded-full flex flex-col items-center justify-center pointer-events-none text-center px-3">
           <span className="font-label-caps text-xs font-semibold text-outline truncate max-w-full">
-            {hovered ? hovered.label.toUpperCase() : 'Categoria Principal'}
+            {hovered ? hovered.label : 'Categoria Principal'}
           </span>
           <span className="font-title-md text-xl font-semibold text-primary truncate max-w-full">
             {hovered ? `${hovered.percent}%` : topCategoryLabel}

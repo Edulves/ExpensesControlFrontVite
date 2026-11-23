@@ -298,7 +298,7 @@ export default function DailyExpensesPage() {
                             <option value="">Todas as categorias</option>
                             {categoryOptions.map((c) => (
                                 <option key={c.transactionCategoryId} value={c.name}>
-                                    {c.name.charAt(0).toUpperCase() + c.name.slice(1)}
+                                    {c.name}
                                 </option>
                             ))}
                         </select>

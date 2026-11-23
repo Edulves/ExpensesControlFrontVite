@@ -1,52 +1,9 @@
 import type { CategoryBreakdownItem } from "../../types";
 import { colorHex } from "./categoryColors";
+import { iconForCategory } from "./categoryIcons";
 
 interface RecentExpensesListProps {
     items: CategoryBreakdownItem[];
-}
-
-// Ícones de categoria (mapeamento por nome da categoria vindo da API).
-// Fallback genérico 'category' caso o nome não esteja mapeado.
-const categoryIcons: Record<string, string> = {
-    lanche: "fastfood",
-    mercado: "shopping_cart",
-    uber: "directions_car",
-    farmacia: "medication",
-    lazer: "celebration",
-    "cuidado pessoal": "spa",
-    "gastos avulsos": "receipt_long",
-    pao: "bakery_dining",
-    "adiantamento cartao de credito": "credit_card",
-    cursos: "school",
-    "cartao de credito": "credit_score",
-    "despesas medicas": "medical_services",
-    "servicos de assinatura": "subscriptions",
-    investimento: "trending_up",
-    moradia: "home",
-    moto: "motorcycle",
-    games: "sports_esports",
-    "despesas dentista": "dentistry",
-    // compatibilidade com nomes alternativos usados anteriormente
-    transporte: "directions_car",
-    transport: "directions_car",
-    aluguel: "home",
-    energia: "bolt",
-    agua: "water_drop",
-    internet: "wifi",
-    celular: "phone_iphone",
-    assinaturas: "movie",
-    alimentacao: "restaurant",
-    comida: "restaurant",
-    carro: "directions_car",
-    saude: "medication",
-    outros: "category",
-    other: "category",
-};
-const fallbackIcon = "category";
-
-function iconFor(item: CategoryBreakdownItem): string {
-    const key = (item.categoryId || item.label || "").toLowerCase();
-    return categoryIcons[key] ?? fallbackIcon;
 }
 
 export default function RecentExpensesList({ items }: RecentExpensesListProps) {
@@ -74,10 +31,10 @@ export default function RecentExpensesList({ items }: RecentExpensesListProps) {
                                             className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
                                             style={{ backgroundColor: `${hex}22`, color: hex }}
                                         >
-                                            <span className="material-symbols-outlined">{iconFor(item)}</span>
+                                            <span className="material-symbols-outlined">{iconForCategory(item.transactionCategoryId)}</span>
                                         </div>
                                         <div className="min-w-0">
-                                            <h4 className="font-body-lg text-base text-on-surface font-medium truncate capitalize">{item.label}</h4>
+                                            <h4 className="font-body-lg text-base text-on-surface font-medium truncate">{item.label}</h4>
                                             <p className="font-body-sm text-sm text-on-surface-variant">{item.percent}% do gasto do mês</p>
                                         </div>
                                     </div>

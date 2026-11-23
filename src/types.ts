@@ -30,6 +30,7 @@ export interface FixedExpense {
 
 export interface CategoryBreakdownItem {
   categoryId: string
+  transactionCategoryId?: number
   label: string
   percent: number
   amount: number
