@@ -25,9 +25,9 @@ const todayLocal = () => {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
-const emptyRow = (categoryId: number): EntryRow => ({
+const emptyRow = (categoryId: number, date: string = todayLocal()): EntryRow => ({
   amount: '',
-  date: todayLocal(),
+  date,
   categoryId,
   note: '',
 })
@@ -37,12 +37,14 @@ export default function AddExpenseModal({ open, onClose, onSaved }: AddExpenseMo
   const [categs, setCategs] = useState<TransactionCategory[]>([])
   const [saving, setSaving] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [confirmDiscard, setConfirmDiscard] = useState(false)
 
   // Ao abrir: reinicia com um lançamento vazio e carrega as categorias reais (Ids inteiros)
   useEffect(() => {
     if (!open) return
     setRows([emptyRow(0)])
     setSubmitError(null)
+    setConfirmDiscard(false)
     let cancelled = false
     fetchTransactionCategories()
       .then((list) => {
@@ -70,7 +72,21 @@ export default function AddExpenseModal({ open, onClose, onSaved }: AddExpenseMo
   }
 
   const addRow = () => {
-    setRows((prev) => [...prev, emptyRow(categs[0]?.transactionCategoryId ?? 0)])
+    // Só a primeira entrada começa com a data de hoje; as seguintes herdam a data da entrada anterior.
+    setRows((prev) => [
+      ...prev,
+      emptyRow(categs[0]?.transactionCategoryId ?? 0, prev[prev.length - 1]?.date || todayLocal()),
+    ])
+  }
+
+  // Há algo digitado que seria perdido ao fechar?
+  const hasChanges = rows.length > 1 || rows.some((r) => r.amount !== '' || r.note.trim() !== '' || r.date !== todayLocal())
+
+  // Clique fora do modal: pede confirmação antes de descartar o que foi preenchido
+  const handleBackdropClick = () => {
+    if (saving) return
+    if (hasChanges) setConfirmDiscard(true)
+    else onClose()
   }
 
   const removeRow = (index: number) => {
@@ -112,7 +128,7 @@ export default function AddExpenseModal({ open, onClose, onSaved }: AddExpenseMo
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-inverse-surface/40 backdrop-blur-sm"
-        onClick={onClose}
+        onClick={handleBackdropClick}
       />
       {/* Modal Content */}
       <div className="bg-surface-container-lowest border border-border-subtle rounded-xl w-full max-w-md mx-4 max-h-[85vh] flex flex-col shadow-xl relative z-10">
@@ -239,6 +255,49 @@ export default function AddExpenseModal({ open, onClose, onSaved }: AddExpenseMo
           </div>
         </form>
       </div>
+
+      {/* Confirmação de descarte (clique fora do modal) */}
+      {confirmDiscard && (
+        <div className="absolute inset-0 z-20 flex items-center justify-center">
+          <div className="absolute inset-0 bg-inverse-surface/20" onClick={() => setConfirmDiscard(false)} />
+          <div
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="discard-title"
+            className="bg-surface-container-lowest border border-border-subtle rounded-xl w-full max-w-sm mx-4 p-6 shadow-xl relative flex flex-col gap-3"
+          >
+            <div className="flex items-center gap-3">
+              <span className="material-symbols-outlined text-warning-amber">warning</span>
+              <h4 id="discard-title" className="font-title-md text-lg font-semibold text-on-surface">
+                Fechar sem salvar?
+              </h4>
+            </div>
+            <p className="font-body-sm text-sm text-on-surface-variant">
+              As entradas que você preencheu ainda não foram salvas. Se fechar agora, tudo o que está no formulário será perdido.
+            </p>
+            <div className="flex justify-end gap-1 mt-2">
+              <button
+                type="button"
+                autoFocus
+                onClick={() => setConfirmDiscard(false)}
+                className="px-4 py-2 font-label-caps text-xs font-semibold text-primary hover:bg-surface-container-low rounded-lg transition-colors"
+              >
+                Continuar editando
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setConfirmDiscard(false)
+                  onClose()
+                }}
+                className="px-4 py-2 font-label-caps text-xs font-semibold bg-negative-rose text-white rounded-lg shadow-sm hover:opacity-90 transition-colors active:scale-95 duration-200"
+              >
+                Fechar e descartar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
