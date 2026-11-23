@@ -53,7 +53,7 @@ export default function DailyExpensesPage() {
     const [page, setPage] = useState(1);
     const [qty, setQty] = useState(10);
     const [totalPages, setTotalPages] = useState(1);
-    const [totalItems, setTotalItems] = useState(0);
+
 
     // Janela de até 5 números de página centrada na página atual (ex.: ‹ 1 [2] 3 4 5 ›).
     const lastPage = Math.max(1, totalPages);
@@ -83,7 +83,6 @@ export default function DailyExpensesPage() {
             ]);
             setExpenses(expenseResponse.items);
             setTotalPages(expenseResponse.totalPages);
-            setTotalItems(expenseResponse.totalItems);
             setTopCategories(categoryData.categories);
             setTotalToday(categoryData.total);
         } catch (err) {
@@ -127,7 +126,6 @@ export default function DailyExpensesPage() {
                 if (!cancelled) {
                     setExpenses(expenseResponse.items);
                     setTotalPages(expenseResponse.totalPages);
-                    setTotalItems(expenseResponse.totalItems);
                     setTopCategories(categoryData.categories);
                     setTotalToday(categoryData.total);
                 }
@@ -148,6 +146,14 @@ export default function DailyExpensesPage() {
             cancelled = true;
         };
     }, [appliedMonth, appliedYear, appliedBeginningOfPeriod, appliedEndOfPeriod, appliedCategory, appliedNote, page, qty]);
+
+    // Se a página atual deixou de existir (ex.: excluiu o último item da última página),
+    // volta para a última página disponível em vez de mostrar uma tabela vazia.
+    useEffect(() => {
+        if (totalPages >= 1 && page > totalPages) {
+            setPage(totalPages);
+        }
+    }, [page, totalPages]);
 
     // Carrega as categorias de transação a partir da API (uma única vez).
     // Usadas para popular o filtro "Categoria". Se falhar, o select fica só
@@ -221,7 +227,7 @@ export default function DailyExpensesPage() {
         if (!window.confirm("Excluir esta despesa?")) return;
         try {
             await deleteDailyExpense(Number(expense.id));
-            setPage(1);
+            // Mantém a página atual; se ela deixar de existir, o efeito abaixo volta para a última.
             loadData();
         } catch (err) {
             window.alert(err instanceof Error ? err.message : "Erro ao excluir despesa.");
@@ -496,7 +502,7 @@ export default function DailyExpensesPage() {
                 expense={editing}
                 onClose={() => setEditing(null)}
                 onSaved={() => {
-                    setPage(1);
+                    // Mantém a página atual após editar.
                     loadData();
                 }}
             />
