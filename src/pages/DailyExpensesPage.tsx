@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppShell from "../components/layout/AppShell";
+import EmptyPeriodState from "../components/ui/EmptyPeriodState";
 import ExpensesTable from "../components/expenses/ExpensesTable";
 import QuickStatsPanel from "../components/expenses/QuickStatsPanel";
 import AddExpenseModal from "../components/expenses/AddExpenseModal";
@@ -17,6 +18,12 @@ import { getCookie } from "../utils/cookies";
 import type { Expense } from "../types";
 
 const MONTHS = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+
+// "2026-11-04" -> "04/11/2026"
+function formatIsoDate(value: string): string {
+    const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(value);
+    return match ? `${match[3]}/${match[2]}/${match[1]}` : value;
+}
 
 export default function DailyExpensesPage() {
     const navigate = useNavigate();
@@ -405,6 +412,16 @@ export default function DailyExpensesPage() {
                         Tentar novamente
                     </button>
                 </div>
+            ) : expenses.length === 0 && page === 1 ? (
+                <EmptyPeriodState
+                    className="py-12"
+                    title={appliedCategory || appliedNote ? "Nenhum lançamento encontrado para os filtros aplicados" : undefined}
+                    description={
+                        appliedBeginningOfPeriod && appliedEndOfPeriod
+                            ? `Não há despesas registradas entre ${formatIsoDate(appliedBeginningOfPeriod)} e ${formatIsoDate(appliedEndOfPeriod)}.`
+                            : `Não há despesas registradas em ${MONTHS[appliedMonth - 1]} de ${appliedYear}.`
+                    }
+                />
             ) : (
                 <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
                     <ExpensesTable expenses={expenses} onEdit={handleEdit} onDelete={handleDelete} />

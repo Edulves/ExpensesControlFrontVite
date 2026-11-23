@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppShell from "../components/layout/AppShell";
 import StatCard from "../components/ui/StatCard";
+import EmptyPeriodState from "../components/ui/EmptyPeriodState";
 
 import CategoryHorizontalBarChart from "../components/dashboard/CategoryHorizontalBarChart";
 import { fetchExpensesPerCategory, fetchTotalDailyExpenses, fetchFixedExpensesConsolidation, type ExpenseByCategory } from "../services/api";
@@ -84,11 +85,19 @@ export default function DashboardPage() {
             const top = data.categories.reduce((max, c) => (c.amount > max.amount ? c : max), data.categories[0]);
             setTopCategoryLabel(top ? top.label : "—");
         } catch (err) {
+            // Zera os valores para não exibir números do período anterior junto com o erro.
+            setTotalExpenses(0);
+            setFixedPaid(0);
+            setFixedPending(0);
+            setBreakdownItems([]);
+            setTopCategoryLabel("—");
             setError(err instanceof Error ? err.message : "Erro ao carregar o breakdown de categorias.");
         } finally {
             setLoading(false);
         }
     };
+
+    const isEmptyPeriod = breakdownItems.length === 0 && totalExpenses === 0 && fixedPaid === 0 && fixedPending === 0;
 
     useEffect(() => {
         loadCategoryBreakdown(appliedMonth, appliedYear);
@@ -202,6 +211,11 @@ export default function DashboardPage() {
                                     Tentar novamente
                                 </button>
                             </div>
+                        ) : isEmptyPeriod ? (
+                            <EmptyPeriodState
+                                className="flex-1 min-h-0"
+                                description={`Não há despesas registradas em ${MONTHS[appliedMonth - 1]} de ${appliedYear}.`}
+                            />
                         ) : (
                             <CategoryHorizontalBarChart items={breakdownItems} topCategoryLabel={topCategoryLabel} />
                         )}

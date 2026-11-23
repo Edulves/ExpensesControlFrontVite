@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppShell from "../components/layout/AppShell";
+import EmptyPeriodState from "../components/ui/EmptyPeriodState";
 import FixedExpenseRow from "../components/fixed-expenses/FixedExpenseRow";
 import EditFixedExpenseModal from "../components/fixed-expenses/EditFixedExpenseModal";
 import AddFixedExpenseModal from "../components/fixed-expenses/AddFixedExpenseModal";
@@ -261,7 +262,10 @@ export default function FixedExpensesPage() {
                         </button>
                     </div>
                 ) : fixedExpenses.length === 0 ? (
-                    <p className="font-body-sm text-sm text-on-surface-variant p-6 text-center">Nenhuma despesa fixa encontrada no período.</p>
+                    <EmptyPeriodState
+                        className="border-0 py-12"
+                        description={`Não há despesas fixas registradas em ${MONTHS[month - 1]} de ${year}.`}
+                    />
                 ) : (
                     <div className="flex flex-col">
                         {fixedExpenses.map((expense) => (

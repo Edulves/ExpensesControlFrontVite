@@ -4,10 +4,12 @@ import DashboardPage from './pages/DashboardPage'
 import DailyExpensesPage from './pages/DailyExpensesPage'
 import FixedExpensesPage from './pages/FixedExpensesPage'
 import ProtectedRoute from './components/ProtectedRoute'
+import AuthExpiredListener from './components/AuthExpiredListener'
 
 export default function App() {
   return (
     <BrowserRouter>
+      <AuthExpiredListener />
       <Routes>
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<LoginPage />} />

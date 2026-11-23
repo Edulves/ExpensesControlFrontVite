@@ -1,5 +1,6 @@
 import type { Expense } from "../types";
 import { getCookie } from "../utils/cookies";
+import { authFetch } from "./auth";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/";
 
@@ -61,11 +62,15 @@ export async function fetchDailyExpenses(filters: DailyExpenseFilters): Promise<
 
     const url = `${API_BASE_URL}/DailyExpenses?${params.toString()}`;
 
-    const response = await fetch(url, {
+    const response = await authFetch(url, {
         headers: {
             Authorization: `Bearer ${token}`,
         },
     });
+
+    if (isEmptyPeriodStatus(response.status)) {
+        return { items: [], currentPage: 1, itemsPerPage: filters.qty ?? 10, totalItems: 0, totalPages: 1 };
+    }
 
     if (!response.ok) {
         throw new Error(`Falha ao buscar despesas (status ${response.status})`);
@@ -125,6 +130,12 @@ const CATEGORY_COLORS = [
     "bg-on-primary-container",
 ];
 
+// Endpoints de consolidação respondem 400/404 quando o período não tem lançamentos;
+// nesses casos tratamos como "sem dados" em vez de erro.
+function isEmptyPeriodStatus(status: number): boolean {
+    return status === 400 || status === 404;
+}
+
 export async function fetchExpensesPerCategory(filters: {
     month: number;
     year: number;
@@ -154,11 +165,16 @@ export async function fetchExpensesPerCategory(filters: {
 
     const url = `${API_BASE_URL}/DataConsolidation/ExpensesPerCategory?${params.toString()}`;
 
-    const response = await fetch(url, {
+    const response = await authFetch(url, {
         headers: {
             Authorization: `Bearer ${token}`,
         },
     });
+
+    // O backend responde 400/404 quando não há lançamentos no período.
+    if (isEmptyPeriodStatus(response.status)) {
+        return { categories: [], total: 0 };
+    }
 
     if (!response.ok) {
         throw new Error(`Falha ao buscar despesas por categoria (status ${response.status})`);
@@ -225,11 +241,15 @@ export async function fetchTotalDailyExpenses(filters: {
 
     const url = `${API_BASE_URL}/DataConsolidation/TotalDailyExpenses?${params.toString()}`;
 
-    const response = await fetch(url, {
+    const response = await authFetch(url, {
         headers: {
             Authorization: `Bearer ${token}`,
         },
     });
+
+    if (isEmptyPeriodStatus(response.status)) {
+        return 0;
+    }
 
     if (!response.ok) {
         throw new Error(`Falha ao buscar total de despesas (status ${response.status})`);
@@ -298,11 +318,15 @@ export async function fetchFixedExpenses(filters: FixedExpenseFilters): Promise<
 
     const url = `${API_BASE_URL}/FixedExpenses?${params.toString()}`;
 
-    const response = await fetch(url, {
+    const response = await authFetch(url, {
         headers: {
             Authorization: `Bearer ${token}`,
         },
     });
+
+    if (isEmptyPeriodStatus(response.status)) {
+        return [];
+    }
 
     if (!response.ok) {
         throw new Error(`Falha ao buscar despesas fixas (status ${response.status})`);
@@ -346,7 +370,7 @@ export async function fetchTransactionCategories(): Promise<TransactionCategory[
         throw new Error("Token de autenticação não encontrado. Faça login novamente.");
     }
 
-    const response = await fetch(`${API_BASE_URL}/TransactionCategories`, {
+    const response = await authFetch(`${API_BASE_URL}/TransactionCategories`, {
         headers: {
             Authorization: `Bearer ${token}`,
         },
@@ -372,7 +396,7 @@ export async function createDailyExpenses(entries: CreateDailyExpenseEntry[]): P
         throw new Error("Token de autenticação não encontrado. Faça login novamente.");
     }
 
-    const response = await fetch(`${API_BASE_URL}/DailyExpenses`, {
+    const response = await authFetch(`${API_BASE_URL}/DailyExpenses`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -408,7 +432,7 @@ export async function updateDailyExpenses(entries: UpdateDailyExpenseEntry[]): P
         throw new Error("Token de autenticação não encontrado. Faça login novamente.");
     }
 
-    const response = await fetch(`${API_BASE_URL}/DailyExpenses`, {
+    const response = await authFetch(`${API_BASE_URL}/DailyExpenses`, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
@@ -436,7 +460,7 @@ export async function deleteDailyExpense(id: number): Promise<void> {
         throw new Error("Token de autenticação não encontrado. Faça login novamente.");
     }
 
-    const response = await fetch(`${API_BASE_URL}/DailyExpenses/${id}?request=${id}`, {
+    const response = await authFetch(`${API_BASE_URL}/DailyExpenses/${id}?request=${id}`, {
         method: "DELETE",
         headers: {
             Authorization: `Bearer ${token}`,
@@ -482,7 +506,7 @@ export async function updateFixedExpensePaidStatus(entry: UpdateFixedExpenseEntr
         throw new Error("Token de autenticação não encontrado. Faça login novamente.");
     }
 
-    const response = await fetch(`${API_BASE_URL}/FixedExpenses`, {
+    const response = await authFetch(`${API_BASE_URL}/FixedExpenses`, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
@@ -512,7 +536,7 @@ export async function updateFixedExpenses(entries: UpdateFixedExpenseEntry[]): P
         throw new Error("Token de autenticação não encontrado. Faça login novamente.");
     }
 
-    const response = await fetch(`${API_BASE_URL}/FixedExpenses`, {
+    const response = await authFetch(`${API_BASE_URL}/FixedExpenses`, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
@@ -541,7 +565,7 @@ export async function createFixedExpenses(entries: CreateFixedExpenseEntry[]): P
         throw new Error("Token de autenticação não encontrado. Faça login novamente.");
     }
 
-    const response = await fetch(`${API_BASE_URL}/FixedExpenses`, {
+    const response = await authFetch(`${API_BASE_URL}/FixedExpenses`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -570,7 +594,7 @@ export async function deleteFixedExpense(id: number): Promise<void> {
         throw new Error("Token de autenticação não encontrado. Faça login novamente.");
     }
 
-    const response = await fetch(`${API_BASE_URL}/FixedExpenses/${id}`, {
+    const response = await authFetch(`${API_BASE_URL}/FixedExpenses/${id}`, {
         method: "DELETE",
         headers: {
             Authorization: `Bearer ${token}`,
@@ -602,11 +626,15 @@ export async function fetchFixedExpensesConsolidation(month: number, year: numbe
 
     const url = `${API_BASE_URL}/DataConsolidation/FixedExpenses?Month=${month}&Year=${year}`;
 
-    const response = await fetch(url, {
+    const response = await authFetch(url, {
         headers: {
             Authorization: `Bearer ${token}`,
         },
     });
+
+    if (isEmptyPeriodStatus(response.status)) {
+        return { paidValue: 0, notPaidValue: 0 };
+    }
 
     if (!response.ok) {
         throw new Error(`Falha ao buscar consolidação de despesas fixas (status ${response.status})`);

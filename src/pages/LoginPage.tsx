@@ -1,18 +1,51 @@
-import { useState, type FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState, type FormEvent } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { setCookie } from "../utils/cookies";
 
 type PopupState = {
-    type: "success" | "error";
+    type: "success" | "error" | "warning";
     message: string;
 } | null;
 
+const popupStyles = {
+    success: {
+        border: "border-positive-emerald",
+        icon: "bg-positive-emerald/10 text-positive-emerald",
+        text: "text-positive-emerald",
+        iconName: "check_circle",
+        title: "Sucesso!",
+    },
+    error: {
+        border: "border-negative-rose",
+        icon: "bg-negative-rose/10 text-negative-rose",
+        text: "text-negative-rose",
+        iconName: "error",
+        title: "Erro",
+    },
+    warning: {
+        border: "border-warning-amber",
+        icon: "bg-warning-amber/10 text-warning-amber",
+        text: "text-warning-amber",
+        iconName: "warning",
+        title: "Sessão expirada",
+    },
+} as const;
+
 export default function LoginPage() {
     const navigate = useNavigate();
+    const location = useLocation();
+    const sessionExpired = Boolean((location.state as { sessionExpired?: boolean } | null)?.sessionExpired);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
-    const [popup, setPopup] = useState<PopupState>(null);
+    const [popup, setPopup] = useState<PopupState>(
+        sessionExpired ? { type: "warning", message: "Sua sessão expirou ou é inválida. Faça login novamente para continuar." } : null,
+    );
+
+    // Limpa o state da navegação para o aviso não reaparecer ao recarregar a página.
+    useEffect(() => {
+        if (sessionExpired) navigate(location.pathname, { replace: true, state: null });
+    }, [sessionExpired, navigate, location.pathname]);
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
@@ -193,20 +226,20 @@ export default function LoginPage() {
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
                     <div
                         className={`w-full max-w-sm bg-surface-container-lowest border rounded-xl p-6 shadow-lg text-center ${
-                            popup.type === "success" ? "border-positive-emerald" : "border-negative-rose"
+                            popupStyles[popup.type].border
                         }`}
                     >
                         <div
                             className={`mx-auto w-12 h-12 rounded-full flex items-center justify-center mb-3 ${
-                                popup.type === "success" ? "bg-positive-emerald/10 text-positive-emerald" : "bg-negative-rose/10 text-negative-rose"
+                                popupStyles[popup.type].icon
                             }`}
                         >
-                            <span className="material-symbols-outlined text-2xl">{popup.type === "success" ? "check_circle" : "error"}</span>
+                            <span className="material-symbols-outlined text-2xl">{popupStyles[popup.type].iconName}</span>
                         </div>
                         <h2
-                            className={`font-display-md text-display-md mb-1 ${popup.type === "success" ? "text-positive-emerald" : "text-negative-rose"}`}
+                            className={`font-display-md text-display-md mb-1 ${popupStyles[popup.type].text}`}
                         >
-                            {popup.type === "success" ? "Sucesso!" : "Erro"}
+                            {popupStyles[popup.type].title}
                         </h2>
                         <p className="font-body-lg text-base text-on-surface-variant mb-6">{popup.message}</p>
                         <button
