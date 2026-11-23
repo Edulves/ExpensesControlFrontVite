@@ -55,6 +55,12 @@ export default function DailyExpensesPage() {
     const [totalPages, setTotalPages] = useState(1);
     const [totalItems, setTotalItems] = useState(0);
 
+    // Janela de até 5 números de página centrada na página atual (ex.: ‹ 1 [2] 3 4 5 ›).
+    const lastPage = Math.max(1, totalPages);
+    const windowSize = Math.min(5, lastPage);
+    const windowStart = Math.min(Math.max(1, page - Math.floor(windowSize / 2)), lastPage - windowSize + 1);
+    const visiblePages = Array.from({ length: windowSize }, (_, i) => windowStart + i);
+
     const loadData = async () => {
         try {
             setLoading(true);
@@ -420,26 +426,58 @@ export default function DailyExpensesPage() {
                                 ))}
                             </select>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <nav aria-label="Paginação" className="flex items-center gap-1">
                             <button
                                 type="button"
+                                aria-label="Página anterior"
                                 disabled={page <= 1}
                                 onClick={() => setPage((p) => Math.max(1, p - 1))}
-                                className="px-3 py-1.5 rounded-lg border border-border-subtle font-label-caps text-xs font-semibold text-primary hover:bg-surface-container-low transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                                className="w-9 h-9 flex items-center justify-center rounded-lg border border-border-subtle text-on-surface-variant hover:bg-surface-container-low transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                             >
-                                Anterior
+                                <span className="material-symbols-outlined text-[20px]">chevron_left</span>
                             </button>
-                            <span className="font-label-caps text-xs font-semibold text-on-surface-variant">
-                                Página {page} de {Math.max(1, totalPages)} · {totalItems} item(ns)
-                            </span>
+                            {visiblePages.map((n) => (
+                                <button
+                                    key={n}
+                                    type="button"
+                                    aria-current={n === page ? 'page' : undefined}
+                                    onClick={() => setPage(n)}
+                                    className={`w-9 h-9 flex items-center justify-center rounded-lg font-body-sm text-sm font-semibold transition-colors ${
+                                        n === page
+                                            ? 'bg-primary text-on-primary shadow-sm'
+                                            : 'text-on-surface hover:bg-surface-container-low'
+                                    }`}
+                                >
+                                    {n}
+                                </button>
+                            ))}
                             <button
                                 type="button"
+                                aria-label="Próxima página"
                                 disabled={page >= totalPages}
                                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                                className="px-3 py-1.5 rounded-lg border border-border-subtle font-label-caps text-xs font-semibold text-primary hover:bg-surface-container-low transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                                className="w-9 h-9 flex items-center justify-center rounded-lg border border-border-subtle text-on-surface-variant hover:bg-surface-container-low transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                             >
-                                Próxima
+                                <span className="material-symbols-outlined text-[20px]">chevron_right</span>
                             </button>
+                        </nav>
+                        <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1.5 font-label-caps text-xs font-semibold text-on-surface-variant">
+                                <label htmlFor="page-select">Ir para página</label>
+                                <select
+                                    id="page-select"
+                                    className="bg-surface-container-lowest border border-border-subtle rounded-lg px-2 py-1.5 font-body-sm text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                                    value={page}
+                                    disabled={totalPages <= 1}
+                                    onChange={(e) => setPage(Number(e.target.value))}
+                                >
+                                    {Array.from({ length: Math.max(1, totalPages) }, (_, i) => i + 1).map((n) => (
+                                        <option key={n} value={n}>
+                                            {n}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
